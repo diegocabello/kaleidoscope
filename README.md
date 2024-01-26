@@ -10,7 +10,7 @@ The creation of a **V-BOOK** involves three main steps: parsing and annotating a
 
 1. Text Parsing and Annotations
    - A **book** is put into a text file.
-     - The books are sourced from [https://gutenberg.org](Project Gutenberg), a libary of public-domain books.
+     - The books are sourced from [Project Gutenberg](https://gutenberg.org), a libary of public-domain books.
      - Examples of books to be used initially are:
        - Pride and Prejudice
        - Alice in Wonderland
