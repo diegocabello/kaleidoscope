@@ -2,7 +2,7 @@
 
 ## About
 
-The objective of this project is to make an application of the most important technological innovation this century, AI, through the invention of a new digital medium, the **V-BOOK**. The **V-BOOK** is an animated video slideshow of AI-generated images corresponding to segments of text from a book, with potential to expand into stories explicitly written in that medium. This application was chosen with intent to preserve literacy and literary culture.
+The objective of this project is to make an application of the most important technology this century, AI, through the invention of a new digital medium, the **V-BOOK**. The **V-BOOK** is an animated video slideshow of AI-generated images corresponding to segments of text from a book, with potential to expand into stories explicitly written in that medium. This application was chosen with intent to preserve literacy and literary culture.
 
 ## How it works
 
