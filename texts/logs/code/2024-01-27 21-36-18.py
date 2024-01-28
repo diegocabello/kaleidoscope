@@ -147,8 +147,7 @@ def main(book_name=None):
         # this unholy list concatenation splits each 'sentence' into two or more if there are return newline patterns in the middle of it 
         sentence_list = [sub_sentence + '\r\n\r\n' if len(sentence.split('\r\n\r\n')) > 1 and sub_sentence != sentence.split('\r\n\r\n')[-1] else sub_sentence for sentence in sentence_list for sub_sentence in sentence.split('\r\n\r\n') if sub_sentence] 
         # and this one splits by semicolon
-        sentence_list = [sub_sentence + ';' if len(sentence.split(';')) > 1 and sub_sentence != sentence.split(';')[-1] else sub_sentence 
-                         for sentence in sentence_list for sub_sentence in sentence.split(';') if sub_sentence and len(sentence) > 150] 
+        sentence_list = [sub_sentence + ';' if len(sentence.split(';')) > 1 and sub_sentence != sentence.split(';')[-1] else sub_sentence for sentence in sentence_list for sub_sentence in sentence.split(';') if sub_sentence and len(sentence) > 50] 
 
         # WRITE TO EXCEL
         sheet = workbook[sheet_name] if sheet_name in workbook.sheetnames else workbook.create_sheet(sheet_name) # make the sheet
@@ -169,7 +168,7 @@ def main(book_name=None):
                 row_values = [None] + [sentence] + [qps['type']] + [len(sentence)] + [None] * (len(columns) - 3)
                 sheet.append(row_values)
                 for cell in sheet[counter + 3]:
-                    cell.fill, cell.border = solid_fill('c00000' if (cell.column == 4 and len(sentence) < cut_by_value) else color), border
+                    cell.fill, cell.border = solid_fill('c00000' if (cell.column == 'D' and len(sentence) < cut_by_value) else color), border
 
         workbook.save(workbook_path)
         print(f'did chapter {str(count + 1)} ')

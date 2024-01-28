@@ -148,7 +148,8 @@ def main(book_name=None):
         sentence_list = [sub_sentence + '\r\n\r\n' if len(sentence.split('\r\n\r\n')) > 1 and sub_sentence != sentence.split('\r\n\r\n')[-1] else sub_sentence for sentence in sentence_list for sub_sentence in sentence.split('\r\n\r\n') if sub_sentence] 
         # and this one splits by semicolon
         sentence_list = [sub_sentence + ';' if len(sentence.split(';')) > 1 and sub_sentence != sentence.split(';')[-1] else sub_sentence 
-                         for sentence in sentence_list for sub_sentence in sentence.split(';') if sub_sentence and len(sentence) > 150] 
+                         if len(sub_sentence) > 50 else sentence
+                         for sentence in sentence_list for sub_sentence in sentence.split(';') if sub_sentence] 
 
         # WRITE TO EXCEL
         sheet = workbook[sheet_name] if sheet_name in workbook.sheetnames else workbook.create_sheet(sheet_name) # make the sheet

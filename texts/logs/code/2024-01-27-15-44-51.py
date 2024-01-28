@@ -13,6 +13,9 @@ initial_quote_color = "DFBB4C"        # light yellow
 alternate_quote_color = "FFE699"      # darker yellow
 initial_paragraph_color = "6691BA"    # light blue
 alternate_paragraph_color = "9BC2E6"  # darker blue
+#mixed = "F89586"                      # light red
+
+color_source_dict = {'paragraph': {'initial': '6691BA', 'alternate': '9BC2E6'}, 'quote': {'initial': 'DFBB4C', 'alternate': 'FFE699'}}
 
 def fragmenter(sentence, speaker=''): # is not currently in use but might use it to automatically tell which speaker is speaking
     return_dict = {}
@@ -37,13 +40,16 @@ paragraph_color = initial_paragraph_color     # redeclare each time
 quote_color = initial_quote_color
 type = 'paragraph'
 
-paragraph_ender_pattern = '[().?!]\r\n\r\n$' # choose between `(`, `)`, `.`, `?`, `!`; optionally (\r\n\r\n), `$` adds to the end
+paragraph_ender_pattern = '[.?!]\r\n\r\n$' # choose between `.`, `?`, `!`; optionally (\r\n\r\n), `$` adds to the end
 def quote_parser(sentence):
 
     global type, paragraph_color, quote_color
 
     display_type = None
-    if '“' in sentence:   #     if sentence.startswith('“'): # this is for the context `Alice said, “something.”`
+    if sentence.startswith('“'):
+        if type == 'paragraph': # this is for the case that it ends in a question mark 
+            quote_color = initial_quote_color
+            paragraph_color = initial_paragraph_color
         type = 'quote'
         if sentence.endswith('.\r\n\r\n'): # this is for the context `"what?" said he.`
             display_type = 'starts quote, ends paragraph'
@@ -51,7 +57,7 @@ def quote_parser(sentence):
         return_color = quote_color
     elif type == 'paragraph':
         return_color = paragraph_color
-    if sentence.endswith('”\r\n\r\n'): # or sentence.endswith('”'):
+    if sentence.endswith('”\r\n\r\n') or sentence.endswith('”'):
         display_type = 'quote flipped'
         type = 'paragraph'
         quote_color = alternate_quote_color if quote_color == initial_quote_color else initial_quote_color
@@ -71,15 +77,13 @@ def main(book_name=None):
         return PatternFill(start_color=color, end_color=color, fill_type='solid')
 
     if not book_name:
-        book_name = 'pride and prejudice'
+        book_name = 'alice in wonderland'
     workbook_path = f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\{book_name}.xlsx'
-    run_log_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    run_log_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     columns = [
-        ['bit', 'information'],
         ['sentence', 'Changed at:'], 
-        ['type', 'information'],
-        ['charachter length', 'information'], 
+        ['type', 'one shot'],
         ['setting', 'until changed'],
         ['style', 'until changed'],
         ['frame', 'one shot'],
@@ -107,16 +111,15 @@ def main(book_name=None):
         paragraph_color = initial_paragraph_color     # redeclare the colors to reset it for each chapter
         quote_color = initial_quote_color
         type = 'paragraph'
-        cut_by_value = 40
 
         # PARSING 
         # basically spacy doesnt support open or closed double quotes and it also sucks so i have to parse it 
         len_ch_min_one = (len(chapter) - 1)
         for counter, quot in enumerate(chapter):                # readding quote marks 
             if counter not in [0, len_ch_min_one]:              # this is first because it causes the code to check itself the least amount of times
-                chapter[counter] = '“' + quot + '”\r\n\r\n'
+                chapter[counter] = '“' + quot + '”'
             elif counter == 0:                             
-                chapter[counter] = quot + '”\r\n\r\n'
+                chapter[counter] = quot + '”'
             elif counter == len_ch_min_one:
                 chapter[counter] = '“' + quot        
 
@@ -144,15 +147,12 @@ def main(book_name=None):
                         print(f'\tpotential dialouge tag after which may need manual concatenation at: sheet {count + 1}, line {counter}, regex')
                         print('\t' + sentence_list[counter] + '\n\t' + sentence_list[counter + 1])
         
-        # this unholy list concatenation splits each 'sentence' into two or more if there are return newline patterns in the middle of it 
+        # this unholy list concatenation finally splits each 'sentence' into two or more if there are return newline patterns in the middle of it 
         sentence_list = [sub_sentence + '\r\n\r\n' if len(sentence.split('\r\n\r\n')) > 1 and sub_sentence != sentence.split('\r\n\r\n')[-1] else sub_sentence for sentence in sentence_list for sub_sentence in sentence.split('\r\n\r\n') if sub_sentence] 
-        # and this one splits by semicolon
-        sentence_list = [sub_sentence + ';' if len(sentence.split(';')) > 1 and sub_sentence != sentence.split(';')[-1] else sub_sentence 
-                         for sentence in sentence_list for sub_sentence in sentence.split(';') if sub_sentence and len(sentence) > 150] 
 
         # WRITE TO EXCEL
         sheet = workbook[sheet_name] if sheet_name in workbook.sheetnames else workbook.create_sheet(sheet_name) # make the sheet
-        sheet.column_dimensions['B'].width = 125
+        sheet.column_dimensions['A'].width = 125
         sheet.freeze_panes = 'A3'
         for column_number, first_value in enumerate(columns, start=1): # this is the header
             cell = sheet.cell(row=1, column=column_number)
@@ -166,10 +166,10 @@ def main(book_name=None):
             if not sentence or not sentence.isspace():
                 qps = quote_parser(sentence)
                 color = qps['color']
-                row_values = [None] + [sentence] + [qps['type']] + [len(sentence)] + [None] * (len(columns) - 3)
+                row_values = [sentence] + [qps['type']] + [None] * (len(columns) - 2)
                 sheet.append(row_values)
                 for cell in sheet[counter + 3]:
-                    cell.fill, cell.border = solid_fill('c00000' if (cell.column == 4 and len(sentence) < cut_by_value) else color), border
+                    cell.fill, cell.border = solid_fill(color), border
 
         workbook.save(workbook_path)
         print(f'did chapter {str(count + 1)} ')
