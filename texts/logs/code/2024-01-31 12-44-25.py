@@ -73,7 +73,7 @@ def main(book_name=None):
 
     if not book_name:
         book_name = 'alice in wonderland'
-    workbook_path = f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\{book_name}.xlsx'
+    workbook_path = f'texts\\{book_name}.xlsx'
     run_log_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
     columns = [
@@ -95,10 +95,10 @@ def main(book_name=None):
 
     cut_by_value = 40
 
-    shutil.copy(r'c:\users\diego\documents\my stuff\programming stuff\babel\super parser.py', f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\logs\\code\\{run_log_time}.py')
+    shutil.copy(r'c:\users\diego\documents\my stuff\programming stuff\babel\super parser.py', f'texts\\logs\\code\\{run_log_time}.py')
 
     # IMPORTING AND PARSING
-    text = bigstringer(f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\{book_name}.txt')
+    text = bigstringer(f'texts\\{book_name}.txt')
     chapter_list = ['CHAPTER ' + chapter for chapter in text.split('CHAPTER') if chapter][0:30]
     #chapter_list = [chapter[(chapter.find('. \r\n')+1):] for chapter in chapter_list]
     for count, chapter in enumerate(chapter_list):
@@ -258,7 +258,7 @@ def main(book_name=None):
             del workbook[sheet]
             workbook.save(workbook_path)
 
-    workbook.save(f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\logs\\excel\\{book_name} {run_log_time}.xlsx')
+    workbook.save(f'texts\\logs\\excel\\{book_name} {run_log_time}.xlsx')
 
     print('done! ')
 

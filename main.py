@@ -1,39 +1,27 @@
-import openai
-from openai import OpenAI
 import os
 
-from imagetest import create_image, crop
-from soundtest import create_audio
-from bigstringer import bigstringer
-from stitch import stitch
-from openaitest import chatgpt, logline
-from text_parser import sentencer  
+from super_parser import parse_book
+from formatter import format_prompts
+from make_video import make_sub_video
 
-client = OpenAI()
+book_name = 'alice in wonderland'
 
-sentences = sentencer(category='file', input='pride and prejudice chapter 2.txt')
+def text_to_speech():
+    pass
+def generate_image():
+    pass
 
-inputer = """
-\n the style should be photorealistic and consistent with the previous images. this is from the novel pride and prejudice, taking place in the 1800s in upscale victorian england. all the costumes and settings should be made to match the time periods. 
-"""
-inputer2='''the style should be photorealistic and consistent with the previous images. this is from the memoars of casanova, taking place in the 1700s europe, primarily in italy. all the costumes and settings should be made to match the time periods. 
-'''
+list_of_prompts = format_prompts(book_name)
+list_of_bits = []
+list_of_sub_video_paths = []
+list_of_audio_paths = []
 
-for counter, value in enumerate(sentences[0:10]):
-    counter = counter + 1
-    value = str(value).strip('\n')
-    prompter = value + inputer2
-    print(value)
-    print('\n')
-    try:
-        create_image(prompt= prompter,
-                     filelocation = 'D:\\babel2\\images',
-                     filename=str(counter))
-        crop(filelocation='D:\\babel2\\images')
-        create_audio(prompt=value, filelocation='D:\\babel2\\audio', filename=str(counter))
-    except openai.BadRequestError:
-        pass
+for bit_counter, bit in enumerate(list_of_bits):
+    text_to_speech(bit, bit_counter)
+    list_of_audio_paths.append(os.path.abspath(f'audio\\{str(bit_counter + 1).mp3}'))
+for prompt_counter, prompt in enumerate(list_of_prompts):
+    generate_image(prompt, prompt_counter)
+    list_of_sub_video_paths.append(os.path.abspath(f'subvideos\\{(str(prompt_counter + 1).mp4)}'))
 
-
-stitch(foldername='D:\\babel2\\video')
-                                                                                    
+for counter, (audio, video) in enumerate(zip(list_of_audio_paths, list_of_sub_video_paths)):
+    make_sub_video((counter + 1), audio, video)

@@ -1,16 +1,19 @@
 import openpyxl
 import subprocess
 
-def main():
-    book_name = 'alice in wonderland'
-    workbook_path = f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\texts\\{book_name}.xlsx'
-    workbook = openpyxl.load_workbook(workbook_path)
+def format_prompts(book_name=None):
+
+    if not book_name:
+        book_name = 'alice in wonderland'
+    workbook = openpyxl.load_workbook(f'texts\\{book_name}.xlsx')
 
     list_of_keys = []
     dicto_change = {}
     dicto_values = {}
 
-    with open(f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\prompts\\{book_name} prompts.txt', 'w') as filer:
+    list_of_prompts = []
+
+    with open(f'prompts\\{book_name} prompts.txt', 'w') as filer:
         filer.write('')
 
     initialize_flag = True
@@ -44,7 +47,7 @@ def main():
                 elif until_changed_bool and not isnt_none_bool and dicto_values[category] is not None:
                     return_string = return_string + f'{category}: {dicto_values[category]} \n'            
 
-            with open(f'c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\prompts\\{book_name} prompts.txt', 'a') as filer:
+            with open(f'prompts\\{book_name} prompts.txt', 'a') as filer:
                 filer.write(return_string + '\n\n')
 
         dicto_values = {key: None for key in dicto_values} # resets at the end of each sheet
@@ -52,6 +55,8 @@ def main():
 
     subprocess.run(f'start notepad prompts\\{book_name} prompts.txt', shell=True)
 
+    return list_of_prompts
+
 if __name__ == "__main__":
-    main()
+    format_prompts()
 

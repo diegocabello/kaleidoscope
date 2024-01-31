@@ -1,27 +1,15 @@
-#parse the text
 #↓ makes a bigstring from the text file by decoding and recoding each letter and adding it to a string
 def bigstringer(file):
     cryptable = open(f'{file}', 'rb').read().decode('utf-8', errors='ignore')
     numchar = 0
     text = ""
     for y in cryptable:
-        char = y.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
-        text = text + char
+        text = text + y.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
         if ((numchar := numchar + 1) % 100000 == 0):
-            print('%s charachters decoded' %(numchar))
+            print(f'{str(numchar)} charachters decoded')
     return text
 
 
-
-
-
-
-
-    #paragraph_list = text.split("\r\n\r\n") # list of paragraphs
-    #sentence_list = text.split('. ')      # list of sentences
-    #sentence_list = [element for element in sentence_list if element != '\n']
-    #return_dict = {"text": text, "paragraphs": paragraph_list, "sentences": sentence_list}
-    #return return_dict
 """
 def bigstringer(file):
     cryptable = open(f'{file}', 'rb').read().decode('utf-8', errors='ignore')
