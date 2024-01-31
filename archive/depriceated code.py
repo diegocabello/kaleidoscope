@@ -358,6 +358,10 @@ def quote_parser(sentence):
             color = alternate_paragraph_color
 
 
+            def det2(inputer):
+    return [{'fragment': frag.strip(', '), 'quotes or not': i % 2 == (0 if str(inputer).startswith('"') else 1} for i, frag in enumerate(str(inputer).split('"')) if frag]
+
+
 '''
 
 
@@ -376,6 +380,7 @@ this is a paragraph.
 this is a quote. 
 """
 
+"""
 initial_quote_color = "DFBB4C"        # light yellow
 alternate_quote_color = "FFE699"      # darker yellow
 initial_paragraph_color = "6691BA"    # light blue
@@ -394,4 +399,56 @@ for line in text.split('\n'):
         return_color = paragraph_color
         paragraph_color = alternate_paragraph_color if paragraph_color == initial_paragraph_color else initial_paragraph_color
 
-    print(return_color)
+    print(return_color)"""
+
+"""
+def fragmenter(sentence, speaker=''): # is not currently in use but might use it to automatically tell which speaker is speaking
+    return_dict = {}
+    stringer = str(sentence)
+    lister = list(x.strip(', ') for x in re.split(r'[“”]', sentence) if x)
+    bool_flag, start_bool_flag = True if stringer.startswith('“') else False, True if stringer.startswith('“') else False
+    for index, value in enumerate(lister):
+        lister[index] = {'fragment': value, 'ends in quotes': bool_flag}
+        if not bool_flag and index == (0 or 1):
+            lister[index]['speaker'] = 'narrator'
+            speaker = str(entitier(inputer = value)[0]) if entitier(inputer = value) else 'a person'
+        bool_flag = not bool_flag
+
+    for index, value in enumerate(lister):
+        if (start_bool_flag and index % 2 == 0) or (not start_bool_flag and index % 2 == 1):
+            lister[index]['speaker'] = speaker ###MEMORIZE THIS   
+    return_dict['lister'], return_dict['speaker'] = lister, speaker
+    return return_dict
+    
+"""
+        
+""" 29 Jan 2024
+        len_ch_min_one = (len(chapter) - 1)
+        for counter, quot in enumerate(chapter):                # readding quote marks 
+            if counter not in [0, len_ch_min_one]:              # this is first because it causes the code to check itself the least amount of times
+                chapter[counter] = '“' + quot + '”\r\n\r\n'
+            elif counter == 0:                             
+                chapter[counter] = quot + '”\r\n\r\n'
+            elif counter == len_ch_min_one:
+                chapter[counter] = '“' + quot    """    
+
+""" 29 Jan 2024 color marker
+    if '“' in sentence:   #     if sentence.startswith('“'): # this is for the context `Alice said, “something.”`
+        type = 'quote'
+    else:
+        type = 'paragraph'
+        # if sentence.endswith('.\r\n\r\n'): # this is for the context `"what?" said he.`
+    if type == 'quote':
+        return_color = quote_color
+    elif type == 'paragraph':
+        return_color = paragraph_color
+        
+    if sentence.endswith('”\r\n\r\n'): # or sentence.endswith('”'):
+        quote_color = alternate_quote_color if quote_color == initial_quote_color else initial_quote_color
+        paragraph_color = initial_paragraph_color
+    elif re.search(paragraph_ender_pattern, sentence) or sentence.endswith('—'): # see regex
+        paragraph_color = alternate_paragraph_color if paragraph_color == initial_paragraph_color else initial_paragraph_color
+        quote_color = initial_quote_color
+
+    return {'color': return_color, 'type': type}
+"""
