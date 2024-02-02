@@ -6,7 +6,7 @@ import time
 import json
 
 class MidjourneyApi():
-    def __init__(self, prompt, application_id, guild_id, channel_id, version, id, authorization):
+    def __init__(self, prompt, application_id, guild_id, channel_id, version, id, authorization, file_name):
         self.application_id = application_id
         self.guild_id = guild_id
         self.channel_id = channel_id
@@ -14,6 +14,7 @@ class MidjourneyApi():
         self.id = id
         self.authorization = authorization
         self.prompt = prompt
+        self.file_name = str(file_name) + '.png' if not str(file_name).endswith('.png') else str(file_name)
         self.message_id = ""
         self.custom_id = ""
         self.image_path_str = ""
@@ -76,8 +77,8 @@ class MidjourneyApi():
             'Authorization': self.authorization,
             "Content-Type": "application/json",
         }
-        for i in range(3):
-            time.sleep(30)
+        timer = 0
+        for i in range(9):
             try:
                 response = requests.get(f'https://discord.com/api/v9/channels/{self.channel_id}/messages', headers=headers)
                 messages = response.json()
@@ -90,8 +91,13 @@ class MidjourneyApi():
                 self.custom_id = random_custom_id
                 break
             except:
-                ValueError("Timeout")
-                
+                ValueError("Timeout: 90 seconds elapsed")
+            time.sleep(10)
+            timer += 10
+            print(f'\tGet Message: {str(timer)} seconds elapsed... ')
+
+
+
     def choose_images(self):
         url = "https://discord.com/api/v9/interactions"
         headers = {
@@ -118,8 +124,11 @@ class MidjourneyApi():
             'Authorization': self.authorization,
             "Content-Type": "application/json",
         }
-        for i in range(3):
-            time.sleep(30)
+        timer = 0
+        for i in range(9):
+            time.sleep(10)
+            timer += 10
+            print(f'\tDownload Image: {str(timer)} seconds elapsed... ')
             try:
                 response = requests.get(f'https://discord.com/api/v9/channels/{self.channel_id}/messages', headers=headers)
                 messages = response.json()
@@ -127,16 +136,15 @@ class MidjourneyApi():
                 self.message_id = most_recent_message_id
                 image_url = messages[0]['attachments'][0]['url'] 
                 image_response = requests.get(image_url)
-                a = urlparse(image_url)
-                image_name = os.path.basename(a.path)
-                self.image_path_str = f"images/{image_name}"
-                with open(f"images/{image_name}", "wb") as file:
+                image_name = os.path.join('images', self.file_name)
+                self.image_name = image_name
+                with open(image_name, "wb") as file:
                     file.write(image_response.content)
                     print(f'image {image_name} saved at "images" ')
                 break
             except:
-                raise ValueError("Timeout")
+                raise ValueError("Timeout: 90 seconds elapsed ")
             
     def image_path(self):
-        return self.image_path_str
+        return self.image_name
     

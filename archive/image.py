@@ -42,17 +42,6 @@ def crop(filelocation=''):
             cmd = f'ffmpeg -i {image_path} -vf "crop=1792:1008:0:8" {cropped_image_path}'
             subprocess.run(cmd, shell=True)
 
-def blur(filelocation='D:\\babel2\\images'):
-    path = os.path.abspath(filelocation)
-    for image in os.listdir(path):
-        cropped_image_path = os.path.join(path, 'cropped', image)
-        blurred_image_path = os.path.join(path, 'zoomed_and_blurred', image)
-        cmd = f'ffmpeg -i {cropped_image_path} -vf "zoompan=z=\'zoom+0.3\':d=1:s=1920x1080, boxblur=15" -frames:v 1  {blurred_image_path}'
-        cmd = f'ffmpeg -i {cropped_image_path} -vf "zoompan=z=\'min(zoom+0.3,2.0)\':x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\':d=1:s=1920x1080, \
-        boxblur=15" -frames:v 1 {blurred_image_path}'
-        subprocess.run(cmd, shell=True)
-        
-
 if __name__ == "__main__":
     prompt=input('what would you like to generate? ')
     filename=input('what would you like to call your file? ')

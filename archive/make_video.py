@@ -6,6 +6,7 @@ import moviepy.editor as mp
 import numpy
 from PIL import Image, ImageDraw, ImageFont
 import sympy as sp
+import ffmpeg
 from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips
 from pydub import AudioSegment
 from colorama import Fore, Back, Style
@@ -14,9 +15,11 @@ from colorama import init as color_init
 from ascii_art_numbers import numbers as numbers
 from caption import max_width as max_caption_width
 
+"""THESE ARE THE GLOBAL VARIABLES"""
 size = (1920, 1080)
 start_percentage = 75
 fps = 24
+""""""
 
 """THIS INITIALIEZES THE COLOR THING"""
 color_init()
@@ -41,6 +44,35 @@ def c_print(color = white, text=None):
 
 c_print(yellow, 'imported...')
 
+"""THIS DEFINES THE CLASS AND MAKES ALL THE OBJECTS"""
+class video_inputs:
+    def __init__(self, image, blurred_image, audio, audio_duration, count, caption_image_path):
+        self.image = image
+        self.blurred_image = blurred_image
+        self.audio = audio
+        self.audio_duration = audio_duration
+        self.count = count
+        self.caption_image_path = caption_image_path
+    
+
+def sotr(number_clips=10):
+    listo = []
+    for x in range(1, number_clips + 1):
+        audio_path = f"D:\\babel2\\audio\\{x}.mp3"
+        thee_class = video_inputs(
+            image = f"D:\\babel2\\images\\cropped\\{x}.png", 
+            blurred_image = f"D:\\babel2\\images\\zoomed_and_blurred\\{x}.png", 
+            audio = AudioFileClip(audio_path), 
+            audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000), # which is in seconds float
+            count = x,
+            caption_image_path = f"c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\images\\captions\\{x-1}.png"
+        )
+
+        listo.append(thee_class)
+
+    return listo
+""""""
+
 def zoom_ratio(frame_number = 1, start_percentage=75, end_percentage = 85):
     diff_ratio = (end_percentage / start_percentage) - 1
     
@@ -53,26 +85,24 @@ def zoom_ratio(frame_number = 1, start_percentage=75, end_percentage = 85):
     
     return multiplier
 
-def make_video(location, count):
 
-    count = str(count)
-
-    image = os.path.join(location, 'images', count + '.png')
-    background = os.path.join(location, 'images', 'backgrounds', count + '.png')
-    audio_path = os.path.join(location, 'audio', count + '.mp3')
-    audio = AudioFileClip(audio_path)
-    audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000)
-    caption = os.path.join(location, 'images', 'captions', count + '.png')
-
+def make_sub_video(inputer = None):
+    # unpack
+    image = inputer.image
+    blurred_img = inputer.blurred_image
+    audio = inputer.audio
+    audio_duration = inputer.audio_duration
+    count = inputer.count
+    caption_image_path = inputer.caption_image_path
     try:
         c_print(yellow, numbers[count] + '\n')
     except:
         pass
 
     ratio = 1
-    blurred_img_obj = Image.open(background)
+    blurred_img_obj = Image.open(blurred_img)
     img_obj = Image.open(image)
-    caption_image_obj = Image.open(caption)
+    caption_image_obj = Image.open(caption_image_path)
 
     frame_count = int(audio_duration * fps)
     c_print(green, str(frame_count) + ' frames ')
@@ -83,6 +113,7 @@ def make_video(location, count):
     re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
 
+    new_frame.paste(overlay_image_obj, (0, 0),  overlay_image_obj.convert("RGBA"))    #darken background image
     new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), 1000), caption_image_obj.convert("RGBA")) # add caption
 
     for frame in range(frame_count):
@@ -104,13 +135,15 @@ def make_video(location, count):
 
     clip = ImageSequenceClip(list_img_frames, fps=fps)  
     clip = clip.set_audio(audio)
-    clip.write_videofile(os.path.join(location, 'subvideos', count + '.mp4'))
+    clip.write_videofile(os.path.abspath(f'D:\\babel2\\video\\subvideos\\{count}.mp4'))
 
     c_print(cyan, f'video {count} made ')
-        
+    
+    return clip
 
-#==============================================================================================================================================
 
+#if os.path.isfile('output.mp4'):                        # the output video 
+#    os.remove('output.mp4')
                                     
 def stitch_from_subvideos():
     subvideos_path_list = list(f'd:\\babel2\\videos\\subvideos\\{x}' for x in range(1,10))
@@ -118,6 +151,10 @@ def stitch_from_subvideos():
 
 def main():
     sub_videos_list = []
+    list_of_objects = sotr()
+
+    for object in list_of_objects:
+        sub_videos_list.append(make_sub_video(inputer = object))
 
     final_clip = concatenate_videoclips(sub_videos_list)
     final_clip.write_videofile("final_output07.mp4") 

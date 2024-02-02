@@ -452,3 +452,47 @@ def fragmenter(sentence, speaker=''): # is not currently in use but might use it
 
     return {'color': return_color, 'type': type}
 """
+
+"""
+import os 
+import subprocess
+
+def blur():
+    path = os.path.abspath(filelocation)
+    for image in os.listdir(path):
+        cropped_image_path = os.path.join(path, 'cropped', image)
+        blurred_image_path = os.path.join(path, 'zoomed_and_blurred', image)
+        cmd = f'ffmpeg -i {cropped_image_path} -vf "zoompan=z=\'zoom+0.3\':d=1:s=1920x1080, boxblur=15" -frames:v 1  {blurred_image_path}'
+        cmd = f'ffmpeg -i {cropped_image_path} -vf "zoompan=z=\'min(zoom+0.3,2.0)\':x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\':d=1:s=1920x1080, \
+        boxblur=15" -frames:v 1 {blurred_image_path}'
+        subprocess.run(cmd, shell=True)
+"""
+
+
+"""
+
+while font.getsize(line := line + words2[0] + ' ')[0] < max_width:
+    words2.pop(0)
+
+#this works but is not compact at all
+line = ''
+wrapped_lines = []
+for word in words: 
+    line_clone = line + word + ' '
+    if font.getsize(line_clone)[0] < max_width:
+        line = line + word + ' '
+    else:
+        wrapped_lines.append(line)
+        line = word
+    if word == words[-1]:
+        wrapped_lines.append(line)
+
+
+
+wrapped_lines = []
+wrapped_lines.extend(line := line + word + ' ' for word in words if font.getsize(line) < max_width else wrapped_lines.append(line), line = '')
+wrapped_lines.extend((line := line + word + ' ') if font.getsize(line + word)[0] < max_width else (wrapped_lines.append(line), line := '') for word in words)
+
+
+line = ' '.join(word for word in words if font.getsize(line)[0] < max_width)
+"""

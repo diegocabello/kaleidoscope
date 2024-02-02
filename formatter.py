@@ -12,6 +12,7 @@ def format_prompts(book_name=None):
     dicto_values = {}
 
     list_of_prompts = []
+    list_of_bits = []
 
     with open(f'prompts\\{book_name} prompts.txt', 'w') as filer:
         filer.write('')
@@ -55,7 +56,7 @@ def format_prompts(book_name=None):
 
     subprocess.run(f'start notepad prompts\\{book_name} prompts.txt', shell=True)
 
-    return list_of_prompts
+    return {'prompts': list_of_prompts, 'bits': list_of_bits}
 
 if __name__ == "__main__":
     format_prompts()

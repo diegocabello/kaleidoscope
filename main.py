@@ -2,26 +2,23 @@ import os
 
 from super_parser import parse_book
 from formatter import format_prompts
-from make_video import make_sub_video
+from make_video import make_video
+from caption import make_caption
+from make_image import make_images
 
 book_name = 'alice in wonderland'
 
-def text_to_speech():
-    pass
-def generate_image():
-    pass
+prompts, bits = format_prompts['prompts'], format_prompts['bits']
 
-list_of_prompts = format_prompts(book_name)
-list_of_bits = []
-list_of_sub_video_paths = []
-list_of_audio_paths = []
+location = None
 
-for bit_counter, bit in enumerate(list_of_bits):
-    text_to_speech(bit, bit_counter)
-    list_of_audio_paths.append(os.path.abspath(f'audio\\{str(bit_counter + 1).mp3}'))
-for prompt_counter, prompt in enumerate(list_of_prompts):
-    generate_image(prompt, prompt_counter)
-    list_of_sub_video_paths.append(os.path.abspath(f'subvideos\\{(str(prompt_counter + 1).mp4)}'))
+def main():
 
-for counter, (audio, video) in enumerate(zip(list_of_audio_paths, list_of_sub_video_paths)):
-    make_sub_video((counter + 1), audio, video)
+    global location 
+
+    for counter, (bit, prompt) in enumerate(zip(bits, prompts)):
+        counter = counter + 1 
+
+        make_caption(text=bit, location=location, file_name = counter)
+        make_images(prompt = prompts[counter - 1], location=location, file_name = counter)
+        make_video(location=location, count=counter)
