@@ -15,6 +15,7 @@ initial_paragraph_color = "6691BA"    # light blue
 alternate_paragraph_color = "9BC2E6"  # darker blue
 initial_bit_color = "7A808C"          # light grey
 alternate_bit_color = "1E1F21"        # dark grey 
+ignore_color = "2A4225"               # green-grey  
 
 def flatten_list(lst):
     result = []
@@ -74,7 +75,7 @@ def parse_book(book_name=None):
     border = Border(left=Side(style='thin', color='575757'), right=Side(style='thin', color='575757'), top=Side(style='thin', color='575757'), bottom=Side(style='thin', color='575757'))
 
     if not book_name:
-        book_name = 'alice in wonderland'
+        book_name = 'pride and prejudice'
     workbook_path = f'texts\\{book_name}.xlsx'
     run_log_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
@@ -90,6 +91,8 @@ def parse_book(book_name=None):
         ('frame', 'one shot'),
         ('speaker', 'one shot'),
         ('spoken to', 'one shot'),
+        ('also present', 'information'), 
+        ('remove presence', 'information')
     ]
 
     cut_by_value = 40
@@ -208,16 +211,16 @@ def parse_book(book_name=None):
                             frame = 'speaker' 
                         else:
                             frame, speaker, spoken_to = None, None, None
-                            special_color = solid_fill('2A4225') # 8C887A
+                            special_color = solid_fill(ignore_color) # 8C887A
                     elif typer == 'paragraph': 
-                        special_color = solid_fill('2A4225') # 8C887A
+                        special_color = solid_fill(ignore_color) # 8C887A
                         frame = None
                     else:
                         frame = None
 
                     other_special_color = color
                     if bit_counter > 0:
-                        other_special_color = solid_fill('2A4225')
+                        other_special_color = solid_fill(ignore_color)
 
                     columns_values = {
                         'bit': {'value': None, 'color': solid_fill(bit_color)},
@@ -231,6 +234,8 @@ def parse_book(book_name=None):
                         'frame': {'value': frame, 'color': special_color},
                         'speaker': {'value': speaker, 'color': special_color},
                         'spoken to': {'value': spoken_to, 'color': special_color},
+                        'also present': {'value': None, 'color': solid_fill('d8d8d8')}, 
+                        'remove presence' : {'value': None, 'color': solid_fill('d8d8d8')}
                     }
 
                     bit_counter = bit_counter + len(sentence)

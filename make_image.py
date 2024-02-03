@@ -11,7 +11,7 @@ channel_id = '1201996275160191027'
 version = '1166847114203123795'
 id = '938956540159881230'
 
-def make_image(prompt='', location=None, file_name=None):
+def make_images(prompt='', location=None, file_name=None):
     file_name = str(file_name) + '.png' if not str(file_name).endswith('.png') else str(file_name)
 
     MidjourneyApi(prompt=prompt, file_name=file_name, application_id=application_id, guild_id=guild_id, channel_id=channel_id, version=version, id=id, authorization=authorization)

@@ -59,10 +59,15 @@ def make_video(location, count):
 
     image = os.path.join(location, 'images', count + '.png')
     background = os.path.join(location, 'images', 'backgrounds', count + '.png')
-    audio_path = os.path.join(location, 'audio', count + '.mp3')
-    audio = AudioFileClip(audio_path)
-    audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000)
     caption = os.path.join(location, 'images', 'captions', count + '.png')
+    try: 
+        audio_path = os.path.join(location, 'audio', count + '.mp3')
+        audio = AudioFileClip(audio_path)
+        audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000)
+        dodobool = True
+    except:
+        audio_duration = 5
+        dodobool = False
 
     try:
         c_print(yellow, numbers[count] + '\n')
@@ -103,7 +108,8 @@ def make_video(location, count):
 
 
     clip = ImageSequenceClip(list_img_frames, fps=fps)  
-    clip = clip.set_audio(audio)
+    if dodobool: 
+        clip = clip.set_audio(audio)
     clip.write_videofile(os.path.join(location, 'subvideos', count + '.mp4'))
 
     c_print(cyan, f'video {count} made ')

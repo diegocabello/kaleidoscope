@@ -496,3 +496,7 @@ wrapped_lines.extend((line := line + word + ' ') if font.getsize(line + word)[0]
 
 line = ' '.join(word for word in words if font.getsize(line)[0] < max_width)
 """
+
+
+"""            # sentence_list = [sub_sentence + '\r\n\r\n' if len(sentence.split('\r\n\r\n')) > 1 and sub_sentence != sentence.split('\r\n\r\n')[-1] else sub_sentence for sentence in sentence_list for sub_sentence in sentence.split('\r\n\r\n') if sub_sentence] 
+"""
