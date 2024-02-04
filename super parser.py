@@ -171,7 +171,6 @@ def parse_book(book_name=None):
 
             for counter, sentence in enumerate(sentence_list):      # spacy doesnt correctly parse open or closed double quotes sometimes
                 if sentence_list[counter].startswith('”'):          # replaces floating closed quotes  
-                    #print(f'\tfound a floating one at {counter}! ')          
                     sentence_list[counter - 1] = sentence_list[counter - 1] + '”'
                     sentence_list[counter] = sentence_list[counter].strip('”')
                 if sentence_list[counter].isspace():   # == '\r\n':
@@ -187,9 +186,9 @@ def parse_book(book_name=None):
                         print(f'\tpotential dialouge tag after which may need manual concatenation at: sheet {count + 1}, line {start_index}, regex')
                         print('\t' + sentence_list[counter] + '\n\t' + sentence_list[counter + 1])
             
-            # this splits by semicolon if it is longer then a certain length and this splits by inline newline sequences 
+            # this splits by semicolon if it is longer then a certain length and this splits by inline newline sequences; currently doesnt account for if there's both 
             flatten_flag = False
-            for counter, sentence in enumerate(sentence_list):
+            for counter, sentence in enumerate(sentence_list): 
                 if len(sentence) > 150 and sentence.find(';') not in [0, -1, (len(sentence) - 1)]:
                     flatten_flag = True
                     sentence_list[counter] = [sub_sentence + ';' if sub_sentence != sentence.split(';')[-1] else sub_sentence 
