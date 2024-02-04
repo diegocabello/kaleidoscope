@@ -23,7 +23,7 @@ def colorprint(color=None, text=None):
     print(color + text + Style.RESET_ALL)
 """"""
 
-font_path = os.path('resources\\fonts\\EBGaramond-Medium.ttf')
+font_path = os.path.join('resources', 'fonts', 'EBGaramond-Medium.ttf')
 font_color = (255, 255, 255)
 max_width = 1536
 font = ImageFont.truetype(font_path, 28)
@@ -62,6 +62,6 @@ def make_caption(text, location, file_name):
         ImageDraw.Draw(final_image).text((width_index, height_index), wrapped_line, fill=font_color, font=font)
         height_index = height_index + sub_image_height
 
-    final_image.save(os.path.join(output_path, file_name))
+    final_image.save(output_path)
     colorprint(green, f'image {file_name} made ')
     

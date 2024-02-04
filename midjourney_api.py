@@ -6,7 +6,7 @@ import time
 import json
 
 class MidjourneyApi():
-    def __init__(self, prompt, application_id, guild_id, channel_id, version, id, authorization, file_name):
+    def __init__(self, prompt, application_id, guild_id, channel_id, version, id, authorization, location, file_name):
         self.application_id = application_id
         self.guild_id = guild_id
         self.channel_id = channel_id
@@ -14,14 +14,10 @@ class MidjourneyApi():
         self.id = id
         self.authorization = authorization
         self.prompt = prompt
+        self.location = location
         self.file_name = str(file_name) + '.png' if not str(file_name).endswith('.png') else str(file_name)
         self.message_id = ""
         self.custom_id = ""
-        self.image_path_str = ""
-        self.send_message()
-        self.get_message()
-        self.choose_images()
-        self.download_image()
 
     def send_message(self):
         url = "https://discord.com/api/v9/interactions"
@@ -136,7 +132,7 @@ class MidjourneyApi():
                 self.message_id = most_recent_message_id
                 image_url = messages[0]['attachments'][0]['url'] 
                 image_response = requests.get(image_url)
-                image_name = os.path.join('images', self.file_name)
+                image_name = os.path.join(self.location, 'images', self.file_name)
                 self.image_name = image_name
                 with open(image_name, "wb") as file:
                     file.write(image_response.content)

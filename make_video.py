@@ -89,6 +89,7 @@ def make_video(location, count):
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
 
     new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), 1000), caption_image_obj.convert("RGBA")) # add caption
+    new_frame_arr = numpy.array(new_frame)
 
     for frame in range(frame_count):
         frame = frame + 1

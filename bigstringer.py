@@ -6,7 +6,7 @@ def bigstringer(file):
     for y in cryptable:
         text = text + y.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
         if ((numchar := numchar + 1) % 100000 == 0):
-            print(f'{str(numchar)} charachters decoded')
+            print(f'{str(numchar)} characters decoded')
     return text
 
 

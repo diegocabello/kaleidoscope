@@ -4,14 +4,22 @@ import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
 initial_bit_color = "7A808C"          # light grey
-alternate_bit_color = "1E1F21"        # dark grey 
 ignore_color = "2A4225"               # green-grey  
 
-def format_prompts(book_name=None):
+character_descriptions = {'Elizabeth': 'a young woman in upperclass fancy victorian dress',
+                          'Darcy': 'a young man in victorian england',
+                          'Mr. Bennet': 'a middle-aged, older man in victorian england',
+                          'Mrs. Bennet': 'a middle aged, older woman in victorian england fancy dress'}
+
+def charachter_with_description(character=''):
+    return f'{character}, {character_descriptions[character]} ' if character in character_descriptions else character
+
+def format_book(book_name=None):
 
     if not book_name:
         book_name = 'pride and prejudice'
     workbook = openpyxl.load_workbook(f'texts\\{book_name}.xlsx')
+    workbook = workbook.worksheets[0:1]
 
     list_of_keys = []
     dicto_change = {}
@@ -19,6 +27,8 @@ def format_prompts(book_name=None):
 
     list_of_prompts = []
     list_of_bits = []
+
+    present_list = []
 
     with open(f'prompts\\{book_name} prompts.txt', 'w') as filer:
         filer.write('')
@@ -39,35 +49,47 @@ def format_prompts(book_name=None):
         bit_counter = 1
         bit_color = initial_bit_color
         bit_values = {key: None for key in dicto_values} 
-        return_string = f'**chapter {sheet_counter + 1} bit {bit_counter}**\n'
+        return_string = ''
 
         for row in sheet.iter_rows(min_row = 3):
 
             for cell_counter, cell in enumerate(row):
                 
                 if cell_counter == 0:
+
                     prev_bit_color = bit_color 
                     bit_color = cell.fill.start_color.rgb[2:]
 
-                    if prev_bit_color != bit_color:                      # formats and resets everything at the end of each bit   
-                        bit_counter += 1
+                    if prev_bit_color != bit_color:                     # at the change of the bit 
 
-                        if bit_values['frame'] == 'speaker':
-                            return_string = return_string + f'{bit_values["speaker"]} is speaking to {bit_values["spoken to"]} in {bit_values["setting"]}\n\
-                                  {"also present are" + bit_values["also present"] if bit_values["also present"] != None else "" if "also present" in bit_values else ""}\n\
-                                      style: {bit_values["style"]}'
+                        if bit_values['frame'] == 'speaker':            # formats
+
+                            also_present_string = ''
+                            if len(present_list) != 0:
+                                for character in present_list:
+                                    also_present_string = also_present_string + charachter_with_description(character)
+
+                            return_string = return_string + f'\
+{charachter_with_description(bit_values["speaker"])} is speaking to {charachter_with_description(bit_values["spoken to"])} \
+in {bit_values["setting"]} \
+{"also present in the background are" + also_present_string if also_present_string != "" else ""} \
+style: {bit_values["style"]} \
+--ar 16:9 '
 
                         else:
                             for value in bit_values:
                                 if bit_values[value] != None:
                                     return_string = return_string + f'{value}: {bit_values[value]} \n'
+                            return_string = return_string + ' --ar 16:9 '
 
-                        list_of_prompts.append(return_string)
+                        list_of_prompts.append(return_string)           # writes
+                        list_of_bits.append(bit_values['sentence'])
                         with open(f'prompts\\{book_name} prompts.txt', 'a') as filer:
-                            filer.write(return_string + '\n\n')
+                            filer.write(f'**chapter {sheet_counter + 1} bit {bit_counter}**\n'+ return_string + '\n\n')
 
-                        return_string = f'**chapter {sheet_counter + 1} bit {bit_counter}**\n' # resets each bit
+                        return_string = f''                             # resets 
                         bit_values = {key: None for key in dicto_values} 
+                        bit_counter += 1
 
 
                 elif cell.fill.start_color.rgb[2:] != ignore_color:
@@ -79,18 +101,25 @@ def format_prompts(book_name=None):
                     until_changed_bool = dicto_change[category] == 'until changed'   
                     isnt_none_bool = cell_value is not None  
 
-                    if until_changed_bool and isnt_none_bool:
+                    if until_changed_bool and isnt_none_bool and category not in ['also present', 'remove presence']:            # if it exists and is marked until changed
                         bit_values[category] = cell_value
                         dicto_values[category] = cell_value
-                    elif (one_shot_bool or category == 'sentence') and isnt_none_bool:
-                        bit_values[category] = bit_values[category] + cell_value if bit_values[category] != None else cell_value
-                    elif until_changed_bool and not isnt_none_bool:      # so if it is none
+                    elif until_changed_bool and not isnt_none_bool and category not in ['also present', 'remove presence']:      # if it's none and is marked until changed 
                         bit_values[category] = dicto_values[category] 
-                        #return_string = return_string + f'{category}: {bit_category_value} \n'            
-
+                    elif (one_shot_bool or category == 'sentence') and isnt_none_bool:                                           # regular data mark
+                        bit_values[category] = bit_values[category] + cell_value if bit_values[category] != None else cell_value
+                    elif category == 'also present':
+                        if cell_value:
+                            present_list.extend(cell_value.split(', '))
+                    elif category == 'remove presence':
+                        if cell_value:
+                            to_remove_list = cell_value.split(', ')
+                            for character in to_remove_list: 
+                                if character in present_list:
+                                    present_list.remove(character)
                     
 
-        dicto_values = {key: None for key in dicto_values} # resets at the end of each sheet
+        dicto_values = {key: None for key in dicto_values}              # resets at the end of each sheet
         print(f'did sheet {str(sheet_counter + 1)} ')
 
     subprocess.run(f'start notepad prompts\\{book_name} prompts.txt', shell=True)

@@ -2,6 +2,8 @@ import re
 import os
 import subprocess
 import shutil
+import sys
+
 import openpyxl
 from datetime import datetime
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
@@ -26,6 +28,10 @@ def flatten_list(lst):
             result.append(item)
     return result
 
+def split_and_tack_on_properly(inputer = '', splitter = ''):
+    splitted = inputer.split(splitter)
+    return [sub_sentence + splitter if sub_sentence != splitted[-1] else sub_sentence for sub_sentence in splitted if sub_sentence] 
+
 def get_speaker(sentence): # automatically tells which speaker is speaking
     speaker = ''
     if (0 < sentence.find('”') + 1 < len(sentence)) or (sentence[1:].find('“') >= 1):
@@ -40,6 +46,13 @@ def get_speaker(sentence): # automatically tells which speaker is speaking
             elif index == 1 and sentence.startswith('“'):
                 speaker = str(entitier(inputer = value)[0]) if entitier(inputer = value) else None
     return speaker if speaker != '' else None
+
+def int_to_excel_column(n):
+    result = ''
+    while n > 0:
+        n, remainder = divmod(n - 1, 26)  # Adjusting for 1-based index
+        result = chr(ord('A') + remainder) + result
+    return result
 
 paragraph_color = initial_paragraph_color     # redeclare each time
 quote_color = initial_quote_color
@@ -75,7 +88,7 @@ def parse_book(book_name=None):
     border = Border(left=Side(style='thin', color='575757'), right=Side(style='thin', color='575757'), top=Side(style='thin', color='575757'), bottom=Side(style='thin', color='575757'))
 
     if not book_name:
-        book_name = 'pride and prejudice'
+        book_name = 'alice in wonderland'
     workbook_path = f'texts\\{book_name}.xlsx'
     run_log_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
@@ -91,9 +104,11 @@ def parse_book(book_name=None):
         ('frame', 'one shot'),
         ('speaker', 'one shot'),
         ('spoken to', 'one shot'),
-        ('also present', 'information'), 
-        ('remove presence', 'information')
+        ('also present', 'until changed'), 
+        ('remove presence', 'until changed')
     ]
+
+    index_of_also_present = next((index for index, column in enumerate(columns) if column[0] == 'also present'), None) + 1
 
     cut_by_value = 40
 
@@ -169,14 +184,15 @@ def parse_book(book_name=None):
             # PARSE SENTENCES
             sentence_list = [str(sentence) for sentence in sentencer(inputer=section)]                          #    ====SENTENCE====
 
+            ques_exclam_close_qt_pattern = '[?!]”\s?$'              # either ? or ! [?!], optional space \s?, anchors pattern to end of string $
+
             for counter, sentence in enumerate(sentence_list):      # spacy doesnt correctly parse open or closed double quotes sometimes
                 if sentence_list[counter].startswith('”'):          # replaces floating closed quotes  
-                    sentence_list[counter - 1] = sentence_list[counter - 1] + '”'
+                    sentence_list[counter - 1] = sentence_list[counter - 1] +  '”'
                     sentence_list[counter] = sentence_list[counter].strip('”')
                 if sentence_list[counter].isspace():   # == '\r\n':
                     del sentence_list[counter]
 
-            ques_exclam_close_qt_pattern = '[?!]”\s?$'              # either ? or ! [?!], optional space \s?, anchors pattern to end of string $
             for counter, sentence in enumerate(sentence_list):      # it could split a partial quote that ends in '!”' or '?”' as '!' and '”' or '?' and '”' so needs multiple 'for' loops
                 if re.search(ques_exclam_close_qt_pattern, sentence_list[counter]): # makes sure sentences with partial quotes that end in '!”' or '?”' stay intact
                     if not sentence_list[counter + 1].startswith("“") and sentence_list[counter + 1][0].islower(): # this isnt completely failproof in case the sentence goes “what on earth?” Alice screamed, or dialogue tag after
@@ -186,59 +202,55 @@ def parse_book(book_name=None):
                         print(f'\tpotential dialouge tag after which may need manual concatenation at: sheet {count + 1}, line {start_index}, regex')
                         print('\t' + sentence_list[counter] + '\n\t' + sentence_list[counter + 1])
             
-            # this splits by semicolon if it is longer then a certain length and this splits by inline newline sequences; currently doesnt account for if there's both 
+            # this splits by semicolon if it is longer then a certain length 
             flatten_flag = False
-            for counter, sentence in enumerate(sentence_list): 
+            for counter, sentence in enumerate(sentence_list):
                 if len(sentence) > 150 and sentence.find(';') not in [0, -1, (len(sentence) - 1)]:
                     flatten_flag = True
-                    sentence_list[counter] = [sub_sentence + ';' if sub_sentence != sentence.split(';')[-1] else sub_sentence 
-                        for sub_sentence in sentence.split(';') if sub_sentence] 
-                elif len(sentence[:-3].split('\r\n\r\n')) > 1:
-                    flatten_flag = True
-                    sentence_list[counter] = [sub_sentence + '\r\n\r\n' if sub_sentence != sentence.split('\r\n\r\n')[-1] else sub_sentence 
-                        for sub_sentence in sentence.split('\r\n\r\n') if sub_sentence] 
+                    sentence_list[counter] = split_and_tack_on_properly(inputer = sentence, splitter = ';')
             if flatten_flag:
                 sentence_list = flatten_list(sentence_list)
 
             # WRITE SENTENCES TO EXCEL 
             bit_color = alternate_bit_color if bit_color == initial_bit_color else initial_bit_color
             bit_counter = 0
+
             for sentence_counter, sentence in enumerate(sentence_list):
                 if not sentence or not sentence.isspace():
 
                     # speaker, color, and typer are defined above; if it is None it has to be defined in an if/else block 
 
-                    special_color = color
+                    paragraph_blackout = color
                     if typer == 'quote':
                         if sentence_counter == 0:
                             frame = 'speaker' 
                         else:
                             frame, speaker, spoken_to = None, None, None
-                            special_color = solid_fill(ignore_color) # 8C887A
+                            paragraph_blackout = solid_fill(ignore_color) # 8C887A
                     elif typer == 'paragraph': 
-                        special_color = solid_fill(ignore_color) # 8C887A
+                        paragraph_blackout = solid_fill(ignore_color) # 8C887A
                         frame = None
                     else:
                         frame = None
 
-                    other_special_color = color
+                    general_blackout, present_blackout = color, solid_fill('d8d8d8')
                     if bit_counter > 0:
-                        other_special_color = solid_fill(ignore_color)
+                        general_blackout, present_blackout = solid_fill(ignore_color), solid_fill(ignore_color)
 
                     columns_values = {
                         'bit': {'value': None, 'color': solid_fill(bit_color)},
                         'sentence': {'value': sentence + ' ', 'color': color},
                         'type': {'value': typer, 'color': color},
                         'character length': {'value': len(sentence), 'color': solid_fill('c00000') if len(sentence) < cut_by_value else color},
-                        'setting': {'value': None, 'color': other_special_color},
-                        'temp setting': {'value': None, 'color': other_special_color}, 
-                        'style': {'value': None, 'color': other_special_color},
-                        'display': {'value': None, 'color': other_special_color}, 
-                        'frame': {'value': frame, 'color': special_color},
-                        'speaker': {'value': speaker, 'color': special_color},
-                        'spoken to': {'value': spoken_to, 'color': special_color},
-                        'also present': {'value': None, 'color': solid_fill('d8d8d8')}, 
-                        'remove presence' : {'value': None, 'color': solid_fill('d8d8d8')}
+                        'setting': {'value': None, 'color': general_blackout},
+                        'temp setting': {'value': None, 'color': general_blackout}, 
+                        'style': {'value': None, 'color': general_blackout},
+                        'display': {'value': None, 'color': general_blackout}, 
+                        'frame': {'value': frame, 'color': paragraph_blackout},
+                        'speaker': {'value': speaker, 'color': paragraph_blackout},
+                        'spoken to': {'value': spoken_to, 'color': paragraph_blackout},
+                        'also present': {'value': None, 'color': present_blackout}, 
+                        'remove presence' : {'value': None, 'color': present_blackout}
                     }
 
                     bit_counter = bit_counter + len(sentence)
@@ -257,7 +269,7 @@ def parse_book(book_name=None):
 
                 start_index = start_index + 1 
 
-        workbook[3][]
+        sheet.cell(row=3, column=index_of_also_present).value = ', '.join(present_list)
 
         workbook.save(workbook_path)
         print(f'did chapter {str(count + 1)} ')
@@ -282,6 +294,12 @@ def parse_book(book_name=None):
     print('launching excel... ')
 
 if __name__ == "__main__":
-    parse_book()
 
-
+    if len(sys.argv) == 1:
+        parse_book()
+    elif len(sys.argv) == 2:
+        book_name = sys.argv[1]
+        parse_book(book_name)
+    else:
+        print('Too many arguments! ')
+        sys.exit(1)
