@@ -2,11 +2,11 @@
 
 ## About
 
-The objective of this project is to make an application of the most important technology this century, AI, through the invention of a new digital medium, the **V-BOOK**. The **V-BOOK** is an animated video slideshow of AI-generated images corresponding to segments of text from a book, with potential to expand into stories explicitly written in that medium. This application was chosen with intent to preserve literacy and literary culture.
+The objective of this project is to create an application of the most important technology from this generation, AI, in a new digital medium: the **V-BOOK**. A **V-BOOK** is an animated and narrated slideshow of AI-generated images derived from a book. This medium was written with expansion in mind, including contracting with publishers and screenplay writers for drafting, and expanding into stories explicitly written for that medium. This application was chosen specifically with intent to preserve literacy and literary culture.
 
 ## How it works
 
-The creation of a **V-BOOK** involves three main steps: parsing and annotating a book, passing the text and annotations through image-generation and text-to-speech APIs, and splicing together animated videoclips. The code for this is entirely written in Python.
+The creation of a **V-BOOK** involves three main steps: parsing and annotating a book, passing the text and annotations through image-generation and text-to-speech APIs, and creating and splicing together animated videoclips. The main language for this project is Python.
 
 1. Text Parsing and Annotations
    - A **book** is put into a text file.
@@ -18,17 +18,17 @@ The creation of a **V-BOOK** involves three main steps: parsing and annotating a
    - The book is **parsed**
      - Split into sentences, each sentence is tagged as either a quote or a paragraph
      - Longer corresponding sentences are split further, shorter ones are concatenated, into "bits" that will be fed into the image-generators as prompts
-     - Each "bit" then loaded into an Excel file and denoted as seperate quote or paragraph by alternating colored and shaded bands
+     - Each "bit" then loaded into an Excel file and denoted as seperate bit and seperate quote or paragraph by alternating colored and shaded bands
    - The parsed text is manually **annotated** in Excel with categories such as setting descriptions, shot type, speaker, charachter descriptions, and framing
    - The annotations are **formatted** into prompts
 2. Image, Audio, and Caption Generation
    - The formatted prompts are passed through an **AI-image generator**, most likely to be Midjourney, and saved locally
-     - Using FFmpeg, The images are zoomed in on, blurred, and darkened for the video background
+     - Using FFmpeg and PIL, The images are zoomed in on, blurred, and darkened for the video background
    - The text bits are passed through a **text-to-speech** API (still looking for the right candidate)
    - The text bits are also centered in an image for **captions**
    - All of this is done asyncronously for each "bit" along with video generation
 3. Video Generation
-   - The image is **pasted on top** of the corresponding background image, and increases in size in a series of frames according to a sqrt equasion (may have to change it), over the duration of the video, which is determined by the length of the audio
+   - The image is **pasted on top** of the corresponding background image, and increases in size in a series of frames according to a sqrt equasion (presently) over the duration of the video, which is determined by the length of the audio
    - Captions are pasted at the bottom
    - The **videoclip** is saved locally
    - Done asyncronously for each "bit" along with Image, Audio, and Caption generation
@@ -36,8 +36,6 @@ The creation of a **V-BOOK** involves three main steps: parsing and annotating a
 
 ## Project Status
 
-At the inital time of commit, on 26 Jan 2024, there is still a lot to be done until release. This is currently the product of about 20 days of solo coding. Some features that still need to be added are, centering the captions vertically, formatting the prompts, testing the prompts in various engines, finding a text-to-speech API, changing the zoom equasion, and adding the asyncronous functionality. ~~ Additional features to be added include automatically detecting which charachter is speaking and automatically determine whether framing should be the speaker or the subject being spoken about when the "bit" is a quote. ~~ (ADDED) Then all the promotional materials, marketing plans, and monetization strategies need to be finalized, but that is another area outside the scope of GitHub. The codebase also needs to be cleaned up and annotated well, and python packages need to be managed.
-
-This was uploaded as an archive but if anyone from the few people I share this to want to contribute, I will gladly accept help and will be willing to share some of the profits.
+On 04 Feb 2024, a working version was tested and completed. This project is mostly over the hill for coding but there are still a few things to be done, including: centering the captions vertically, finding a text-to-speech API, changing the zoom equasion and applying it to the background, adding asyncronous functionality, and managing python packages. This project has expanded beyond the scope of one person working on it and is currently in the planning phase for marketing, financing, and deployement. 
 
 Created by Diego Cabello
