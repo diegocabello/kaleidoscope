@@ -16,6 +16,7 @@ from caption import max_width as max_caption_width
 
 size = (1920, 1080)
 start_percentage = 75
+end_percentage = 85
 fps = 24
 
 """THIS INITIALIEZES THE COLOR THING"""
@@ -88,7 +89,7 @@ def make_video(location, count):
     re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
 
-    new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), int((size[1] - ((size[1] * 0.15 / 2) + caption_image_obj.height)/2))), caption_image_obj.convert("RGBA")) # add caption
+    new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), int((size[1] - ((size[1] * ((100 - end_percentage) / 100) / 2) + caption_image_obj.height)/2))), caption_image_obj.convert("RGBA")) # add caption
     new_frame_arr = numpy.array(new_frame)
 
     for frame in range(frame_count):
