@@ -20,13 +20,16 @@ def main(book_name = 'pride and prejudice'):
         counter = counter + 1 
         print(bit)
 
-        make_caption(text=bit, location=location, file_name = counter)
-        make_images(prompt = prompt, location=location, file_name = counter)
+        try:
+            make_caption(text=bit, location=location, file_name = counter)
+            #make_images(prompt = prompt, location=location, file_name = counter)
 
-        make_video(location=location, count=counter)
+            make_video(location=location, count=counter)
 
-        list_of_subvideo_paths.append(os.path.join(location, 'subvideos', str(counter) + '.mp4'))
-        print(f'made subvideo {str(counter)} ')
+            list_of_subvideo_paths.append(os.path.join(location, 'subvideos', str(counter) + '.mp4'))
+            print(f'made subvideo {str(counter)} ')
+        except(PermissionError):
+            print(f'skipped subvideo {str(counter)} - image file may be corrupted')
 
 
     subvideo_clips = [VideoFileClip(path) for path in list_of_subvideo_paths]
