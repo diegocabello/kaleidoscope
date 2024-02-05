@@ -8,4 +8,5 @@
 4. Open the excel file in 'texts' with the book name as the file name and add annotations. 
 5. Run 'main.py'. Make sure you specify weather you want the temp image audio and video files saved on your local drive or an external one. 
 
-Note: PIL needs to be version 9.0 not 10.0, otherwise making the video will crash. 
+External Dependancy 1: FFMpeg needs to be installed. 
+Note 1: PIL needs to be version 9.0 not 10.0, otherwise making the video will crash. 
