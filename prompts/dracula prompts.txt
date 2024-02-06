@@ -1,0 +1,169 @@
+**chapter 1 bit 1**
+CHAPTER  XXI
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 2**
+DR.SEWARD’S DIARY
+3 October.—Let me put down with exactness all that happened, as well as I can remember it, since last I made an entry.Not a detail that I can recall must be forgotten; in all calmness I must proceed.
+prompt: a man in 1900s clothing is sitting at a desk writing in his journal looking very intently. Lit by candlelight. 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 3**
+When I came to Renfield’s room I found him lying on the floor on his left side in a glittering pool of blood.
+prompt: a man in 1900s clothing walks into a room through the door and sees a person lying down on the floor in a pool of blood. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 4**
+When I went to move him, it became at once apparent that he had received some terrible injuries;
+prompt: a man in 1900s clothing tries to move a terribly injured body on the floor in the middle of the room 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 5**
+there seemed none of that unity of purpose between the parts of the body which marks even lethargic sanity.As the face was exposed I could see that it was horribly bruised, as though it had been beaten against the floor—indeed it was from the face wounds that the pool of blood originated.
+prompt: there is a mangled body lying on the floor in the middle of the room. Its is very badly bruised but still alive. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+display: top down view  
+ --ar 16:9 
+
+**chapter 1 bit 6**
+The attendant who was kneeling beside the body said to me as we turned him over:—
+prompt: a man in 1900s clothing is looking at a mangled person's body on the floor in the middle of the room. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 7**
+“I think, sir, his back is broken.See, both his right arm and leg and the whole side of his face are paralysed.”How such a thing could have happened puzzled the attendant beyond measure.
+prompt: a view from the top down of a mangled persons body lying on the floor. His face is smashed, his back is broken. Two men in 1900s clothing look onwards, one is speaking 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 8**
+He seemed quite bewildered, and his brows were gathered in as he said:—
+prompt: a view from the top down of a mangled persons body lying on the floor. His face is smashed, his back is broken. Two more men in 1900s clothing are standing around him looking downwards, one is speaking 
+setting: a room in a castle 
+style: gothic, photorealistic 
+display: top down view  
+ --ar 16:9 
+
+**chapter 1 bit 9**
+“I can’t understand the two things.He could mark his face like that by beating his own head on the floor.
+prompt: a man wearing 1900s clothing is head smashing his face into the floor in the middle of the room 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 10**
+I saw a young woman do it once at the Eversfield Asylum before anyone could lay hands on her.
+prompt: a woman in an asylum cell is smashing hitting her head against the wall 
+setting: a 1900s asylum cell 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 11**
+And I suppose he might have broke his neck by falling out of bed, if he got in an awkward kink.But for the life of me I can’t imagine how the two things occurred.
+prompt: a man falls out of bed, breaking his neck, his body laying akwardly. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 12**
+If his back was broke, he couldn’t beat his head; and if his face was like that before the fall out of bed, there would be marks of it.”I said to him:—
+prompt: a view from the top down of a mangled persons body lying on the floor. His face is smashed, his back is broken. Two men in 1900s clothing look onwards, top down view 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 13**
+“Go to Dr. Van Helsing, and ask him to kindly come here at once.I want him without an instant’s delay.”
+prompt: a man in 1900s clothing is speaking to another man in 1900s clothing , pointing his finger at him giving him instructions 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 14**
+The man ran off, and within a few minutes the Professor, in his dressing gown and slippers, appeared.When he saw Renfield on the ground, he looked keenly at him a moment, and then turned to me.I think he recognised my thought in my eyes, for he said very quietly, manifestly for the ears of the attendant:—
+prompt: a man in 1900s clothing walks out the room while another man in 1900s clothing stands over a mangled body in the middle of the room in a castle 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 15**
+“Ah, a sad accident!He will need very careful watching, and much attention.I shall stay with you myself; but I shall first dress myself.If you will remain I shall in a few minutes join you.”
+prompt: a man in 1900s clothing is looking at a mangled person's body on the floor in the middle of the  . Another person is kneeling besides the body. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 16**
+The patient was now breathing stertorously and it was easy to see that he had suffered some terrible injury.Van Helsing returned with extraordinary celerity, bearing with him a surgical case.
+prompt: a mangled body lying on the floor in a room is struggling to breathe. A  man dressed in 1900s clothing looks on. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 17**
+He had evidently been thinking and had his mind made up; for, almost before he looked at the patient, he whispered to me:—
+prompt: a doctor and a man dressed in 1900s clothing run into a room where there is a mangled body lying in the middle of the room struggling to breathe and another man dressed in 1900s clothing standing besides him. 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 18**
+“Send the attendant away.We must be alone with him when he becomes conscious, after the operation.”So I said:—
+prompt: a doctor is whispering to a man dressed in 1900s clothing. Focus on just the doctor and the man, and their faces 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 19**
+“I think that will do now, Simmons.We have done all that we can at present.You had better go your round, and Dr. Van Helsing will operate.Let me know instantly if there be anything unusual anywhere.”
+prompt: a man in 1900s clothing speaks to another man in 1900s clothing in 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 20**
+The man withdrew, and we went into a strict examination of the patient.
+prompt: a man in 1900s clothing walks out the room while another man in 1900s clothing and a doctor stand over a mangled body in the middle of 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 21**
+The wounds of the face was superficial; the real injury was a depressed fracture of the skull, extending right up through the motor area.
+prompt: a doctor and a man in 1900s clothing are standing over a body in the middle of  . 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 22**
+The Professor thought a moment and said:—“We must reduce the pressure and get back to normal conditions, as far as can be;the rapidity of the suffusion shows the terrible nature of his injury.
+prompt: the doctor is speaking, in focus the background is blurred and a man in 1900s clothing standing behind him is blurred 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+
+**chapter 1 bit 23**
+The whole motor area seems affected.The suffusion of the brain will increase quickly, so we must trephine at once or it may be too late.”As he was speaking there was a soft tapping at the door.
+prompt: a mangled body lying on the floor in a room is struggling to move 
+setting: a room in a castle 
+style: gothic, photorealistic 
+display: top down view  
+ --ar 16:9 
+
+**chapter 1 bit 24**
+I went over and opened it and found in the corridor without, Arthur and Quincey in pajamas and slippers: the former spoke:—
+prompt: two men in 1900s pajamas and slippers are at the door to the entrance of the room. A man in 1900s formal attire is opening the door 
+setting: a room in a castle 
+style: gothic, photorealistic 
+ --ar 16:9 
+

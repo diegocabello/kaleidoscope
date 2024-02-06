@@ -19,13 +19,16 @@ initial_bit_color = "7A808C"          # light grey
 alternate_bit_color = "1E1F21"        # dark grey 
 ignore_color = "2A4225"               # green-grey  
 
+paragraph_ender_pattern = '[).?!]\r\n\r\n$'         # choose between `)`, `.`, `?`, `!`; optionally (\r\n\r\n), `$` adds to the end | need to add `—` as an 'or' option 
+ques_exclam_close_qt_pattern = '[?!]”\s?$'              # either ? or ! [?!], optional space \s?, anchors pattern to end of string $
+
 def flatten_list(lst):
     result = []
     for item in lst:
         if isinstance(item, list):
             result.extend(flatten_list(item))
-        else:
-            result.append(item)
+        elif isinstance(item, str):
+            result.append(item.strip())
     return result
 
 def split_and_tack_on_properly(inputer = '', splitter = ''):
@@ -54,19 +57,14 @@ def int_to_excel_column(n):
         result = chr(ord('A') + remainder) + result
     return result
 
-paragraph_color = initial_paragraph_color     # redeclare each time
-quote_color = initial_quote_color
-type = 'paragraph'
-
-paragraph_ender_pattern = '[).?!]\r\n\r\n$' # choose between `)`, `.`, `?`, `!`; optionally (\r\n\r\n), `$` adds to the end | need to add `—` as an 'or' option 
-def section_parser(sentence):
+def section_parser(section):
 
     global type, paragraph_color, quote_color
 
-    if '“' in sentence:       # if sentence.startswith('“'): # this is for the context `Alice said, “something.”`
+    if '“' in section:       # if section.startswith('“'): # this is for the context `Alice said, “something.”`
         type = 'quote'
     else:
-        type = 'paragraph'    # if sentence.endswith('.\r\n\r\n'): # this is for the context `"what?" said he.`
+        type = 'paragraph'    # if section.endswith('.\r\n\r\n'): # this is for the context `"what?" said he.`
     if type == 'quote':
         return_color = quote_color
         quote_color = alternate_quote_color if quote_color == initial_quote_color else initial_quote_color
@@ -77,6 +75,9 @@ def section_parser(sentence):
         quote_color = initial_quote_color
 
     return {'color': return_color, 'type': type}
+
+def sentence_parser(sentence):
+    pass
 
 def parse_book(book_name=None):
 
@@ -97,8 +98,8 @@ def parse_book(book_name=None):
         ('sentence', 'information'),
         ('type', 'information'),
         ('character length', 'information'),
+        ('prompt', 'until changed'),
         ('setting', 'until changed'),
-        ('temp setting', 'one shot'),
         ('style', 'until changed'),
         ('display', 'one shot'), 
         ('frame', 'one shot'),
@@ -125,13 +126,13 @@ def parse_book(book_name=None):
         subprocess.run(f'del "texts\\{book_name}.xlsx"', shell=True)
     workbook = openpyxl.Workbook()
 
-    for count, chapter in enumerate(chapter_list):                                                              #    ====CHAPTER====
+    for chapter_counter, chapter in enumerate(chapter_list):                                                    #    ====CHAPTER====
 
-        sheet_name = str(count + 1) 
+        sheet_name = str(chapter_counter + 1) 
         start_index = 3
 
         paragraph_color, quote_color, bit_color = initial_paragraph_color, initial_quote_color, alternate_bit_color   # redeclare the colors to reset it for each chapter
-        prev_type, speaker = None, None
+        speaker = None
         do_the_thing_flag = True
         type = 'paragraph'
         present_list = []
@@ -139,6 +140,7 @@ def parse_book(book_name=None):
         # WRITE HEADER TO EXCEL
         sheet = workbook[sheet_name] if sheet_name in workbook.sheetnames else workbook.create_sheet(sheet_name) # make the sheet
         sheet.column_dimensions['B'].width = 125
+        sheet.column_dimensions['E'].width = 65
         sheet.freeze_panes = 'A3'
         for column_number, value in enumerate(columns, start=1): # this is the header
             cell = sheet.cell(row=1, column=column_number)
@@ -150,19 +152,19 @@ def parse_book(book_name=None):
             cell.alignment, cell.border, cell.fill = Alignment(horizontal='center'), header_border, solid_fill('AD7070' if value[1] == 'one shot' else '974B4B')
 
         # PARSE SECTIONS
-        for section in chapter:                                                                                 #    ====SECTION====
+        for section_counter, section in enumerate(chapter):                                                     #    ====SECTION====
+
             sp = section_parser(section)
-
-            prev_type = typer if prev_type else None    # pushes it back if its there
-
             color = solid_fill(sp['color'])
-            typer = sp['type']
 
-            if not prev_type:                           # defines it if its not there 
+            if section_counter == 0:
+                prev_type, typer = sp['type'], sp['type']
+            else:
                 prev_type = typer
+                typer = sp['type']
 
             if type == 'paragraph':
-                do_the_thing_flag = True
+                do_the_thing_flag = True 
 
             spoken_to = None
             if typer == 'quote':
@@ -183,36 +185,41 @@ def parse_book(book_name=None):
 
             # PARSE SENTENCES
             sentence_list = [str(sentence) for sentence in sentencer(inputer=section)]                          #    ====SENTENCE====
+            flatten_flag = False
 
-            ques_exclam_close_qt_pattern = '[?!]”\s?$'              # either ? or ! [?!], optional space \s?, anchors pattern to end of string $
+            for sentence_counter, sentence in enumerate(sentence_list):      # spacy doesnt correctly parse open or closed double quotes sometimes
 
-            for counter, sentence in enumerate(sentence_list):      # spacy doesnt correctly parse open or closed double quotes sometimes
-                if sentence_list[counter].startswith('”'):          # replaces floating closed quotes  
-                    sentence_list[counter - 1] = sentence_list[counter - 1] +  '”'
-                    sentence_list[counter] = sentence_list[counter].strip('”')
-                if sentence_list[counter].isspace():   # == '\r\n':
-                    del sentence_list[counter]
+                clone_minus_one = sentence_list[sentence_counter - 1]
+                clone_itself = sentence_list[sentence_counter]
 
-            for counter, sentence in enumerate(sentence_list):      # it could split a partial quote that ends in '!”' or '?”' as '!' and '”' or '?' and '”' so needs multiple 'for' loops
-                if re.search(ques_exclam_close_qt_pattern, sentence_list[counter]): # makes sure sentences with partial quotes that end in '!”' or '?”' stay intact
-                    if not sentence_list[counter + 1].startswith("“") and sentence_list[counter + 1][0].islower(): # this isnt completely failproof in case the sentence goes “what on earth?” Alice screamed, or dialogue tag after
-                        sentence_list[counter] += ' ' + sentence_list.pop(counter + 1)                        
+                if clone_itself.startswith('”'):          # replaces floating closed quotes  
+                    clone_minus_one = clone_minus_one +  '”'
+                    clone_itself = clone_itself.strip('”')
+
+                if re.search(ques_exclam_close_qt_pattern, clone_itself): # makes sure sentences with partial quotes that end in '!”' or '?”' stay intact  # it could split a partial quote that ends in '!”' or '?”' as '!' and '”' or '?' and '”' so needs multiple 'for' loops
+                    if not sentence_list[sentence_counter + 1].startswith("“") and sentence_list[sentence_counter + 1][0].islower(): # this isnt completely failproof in case the sentence goes “what on earth?” Alice screamed, or dialogue tag after
+                        clone_itself += ' ' + sentence_list.pop(sentence_counter + 1)                        
                         print(f'\tconcatenated sentence at: sheet {count + 1}, line {start_index}')
                     else:
                         print(f'\tpotential dialouge tag after which may need manual concatenation at: sheet {count + 1}, line {start_index}, regex')
-                        print('\t' + sentence_list[counter] + '\n\t' + sentence_list[counter + 1])
+                        print('\t' + clone_itself + '\n\t' + sentence_list[sentence_counter + 1])
             
-            # this splits by semicolon if it is longer then a certain length 
-            flatten_flag = False
-            for counter, sentence in enumerate(sentence_list):
-                if len(sentence) > 150 and sentence.find(';') not in [0, -1, (len(sentence) - 1)]:
+                if len(sentence) > 150 and sentence.find(';') not in [0, -1, (len(sentence) - 1)]:  # this splits by semicolon if it is longer then a certain length 
                     flatten_flag = True
-                    sentence_list[counter] = split_and_tack_on_properly(inputer = sentence, splitter = ';')
+                    clone_itself = split_and_tack_on_properly(inputer = sentence, splitter = ';')
+
+                sentence_list[sentence_counter - 1] = clone_minus_one
+
+                if isinstance(clone_itself, str):
+                    sentence_list[sentence_counter] = clone_itself.strip()
+                else:
+                    sentence_list[sentence_counter] = clone_itself 
+
             if flatten_flag:
                 sentence_list = flatten_list(sentence_list)
 
             # WRITE SENTENCES TO EXCEL 
-            bit_color = alternate_bit_color if bit_color == initial_bit_color else initial_bit_color
+            bit_color = alternate_bit_color if bit_color == initial_bit_color else initial_bit_color            #    ====EXCEL====
             bit_counter = 0
 
             for sentence_counter, sentence in enumerate(sentence_list):
@@ -220,7 +227,7 @@ def parse_book(book_name=None):
 
                     # speaker, color, and typer are defined above; if it is None it has to be defined in an if/else block 
 
-                    paragraph_blackout = color
+                    paragraph_blackout = solid_fill('a2a2a2')
                     if typer == 'quote':
                         if sentence_counter == 0:
                             frame = 'speaker' 
@@ -233,24 +240,24 @@ def parse_book(book_name=None):
                     else:
                         frame = None
 
-                    general_blackout, present_blackout = color, solid_fill('d8d8d8')
+                    general_blackout = solid_fill('a2a2a2')
                     if bit_counter > 0:
-                        general_blackout, present_blackout = solid_fill(ignore_color), solid_fill(ignore_color)
+                        general_blackout = solid_fill(ignore_color)
 
                     columns_values = {
-                        'bit': {'value': None, 'color': solid_fill(bit_color)},
-                        'sentence': {'value': sentence + ' ', 'color': color},
-                        'type': {'value': typer, 'color': color},
-                        'character length': {'value': len(sentence), 'color': solid_fill('c00000') if len(sentence) < cut_by_value else color},
-                        'setting': {'value': None, 'color': general_blackout},
-                        'temp setting': {'value': None, 'color': general_blackout}, 
-                        'style': {'value': None, 'color': general_blackout},
-                        'display': {'value': None, 'color': general_blackout}, 
-                        'frame': {'value': frame, 'color': paragraph_blackout},
-                        'speaker': {'value': speaker, 'color': paragraph_blackout},
-                        'spoken to': {'value': spoken_to, 'color': paragraph_blackout},
-                        'also present': {'value': None, 'color': present_blackout}, 
-                        'remove presence' : {'value': None, 'color': present_blackout}
+                        'bit': {'value': None, 'color': solid_fill(bit_color), 'alignment': None},
+                        'sentence': {'value': sentence + ' ', 'color': color, 'alignment': Alignment(vertical='center', wrap_text=True)},
+                        'type': {'value': typer, 'color': color, 'alignment': None},
+                        'character length': {'value': len(sentence), 'color': solid_fill('c00000') if len(sentence) < cut_by_value else color, 'alignment': None},
+                        'prompt': {'value': None, 'color': general_blackout, 'alignment': Alignment(vertical='center', wrap_text=True)},
+                        'setting': {'value': None, 'color': general_blackout, 'alignment': None}, 
+                        'style': {'value': None, 'color': general_blackout, 'alignment': None},
+                        'display': {'value': None, 'color': general_blackout, 'alignment': None}, 
+                        'frame': {'value': frame, 'color': paragraph_blackout, 'alignment': None},
+                        'speaker': {'value': speaker, 'color': paragraph_blackout, 'alignment': None},
+                        'spoken to': {'value': spoken_to, 'color': paragraph_blackout, 'alignment': None},
+                        'also present': {'value': None, 'color': general_blackout, 'alignment': None}, 
+                        'remove presence' : {'value': None, 'color': general_blackout, 'alignment': None}
                     }
 
                     bit_counter = bit_counter + len(sentence)
@@ -265,7 +272,7 @@ def parse_book(book_name=None):
                     sheet.append(row_values)
 
                     for cell_counter, cell in enumerate(sheet[start_index]):
-                        cell.fill, cell.border = columns_values[columns[cell_counter][0]]['color'], border 
+                        cell.fill, cell.border, cell.alignment = columns_values[columns[cell_counter][0]]['color'], border,  columns_values[columns[cell_counter][0]]['alignment']
 
                 start_index = start_index + 1 
 

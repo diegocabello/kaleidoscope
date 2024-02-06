@@ -31,13 +31,15 @@ magenta = Fore.MAGENTA
 cyan = Fore.CYAN
 white = Fore.WHITE
 
+reset = Style.RESET_ALL
+
 def colorprint(color=None, text=None):
     text = str(text)
-    print(color + text + Style.RESET_ALL)
+    print(color + text + reset)
 
 def c_print(color = white, text=None):
     text = str(text)
-    print(color + text + Style.RESET_ALL)
+    print(color + text + reset)
 """"""
 
 c_print(yellow, 'imported...')
@@ -89,24 +91,40 @@ def make_video(location, count):
     re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
 
-    new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), int((size[1] - ((size[1] * ((100 - end_percentage) / 100) / 2) + caption_image_obj.height)/2))), caption_image_obj.convert("RGBA")) # add caption
+    to_branch_from = (size[1] * ((100 - end_percentage) / 2 ) / 100)
+    other_expendature = (size[1] - to_branch_from) + (to_branch_from / 2)
+    capt_cushion = (caption_image_obj.height / 2) # adds half the caption height to it to center it 
+    capt_height_coord = int(other_expendature - capt_cushion)
+    capt_width_coord = int((size[0] - max_caption_width) // 2)
+    caption_coords = (capt_width_coord, capt_height_coord)
+
+    new_frame.paste(caption_image_obj, caption_coords, caption_image_obj.convert("RGBA")) # add caption
     new_frame_arr = numpy.array(new_frame)
 
+    change_frame_count = 0
+    change_frame_flag = False
     for frame in range(frame_count):
         frame = frame + 1
         new_re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
+
         if new_re_size[1] > re_size[1]:
+            change_frame_count += 1
+            change_frame_flag = True
             re_sized_image = img_obj.resize(new_re_size, Image.LANCZOS)
             re_size = new_re_size
             position = tuple(((s - r) // 2) for s, r in zip(size, re_size))
-            new_frame.paste(re_sized_image, position, re_sized_image.convert("RGBA"))      #overlay image
+            new_frame.paste(re_sized_image, position, re_sized_image.convert("RGBA"))      # overlay image
             new_frame_arr = numpy.array(new_frame)
 
         list_img_frames.append(new_frame_arr)
-
         ratio = zoom_ratio(frame_number = (frame+1))
 
-        c_print(red, f'image {frame} of {frame_count} made ')
+        if change_frame_flag:
+            print(red + 'new image ' + green + str(change_frame_count).zfill(2) + red + ' at frame ' + green + str(frame).zfill(2) + red + ' of ' + green + str(frame_count) + reset)
+
+        change_frame_flag = False
+
+    print(red + 'frame ' + green + str(frame_count) + red + ' of ' + green + str(frame_count) + reset)
 
 
     clip = ImageSequenceClip(list_img_frames, fps=fps)  

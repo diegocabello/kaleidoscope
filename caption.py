@@ -31,6 +31,8 @@ font = ImageFont.truetype(font_path, 28)
 
 def make_caption(text, location, file_name):
 
+    print(text)
+
     file_name = str(file_name) + '.png' if not str(file_name).endswith('.png') else str(file_name)
     output_path = os.path.join(location, 'images\\captions', file_name)
 
@@ -64,4 +66,4 @@ def make_caption(text, location, file_name):
 
     final_image.save(output_path)
     colorprint(green, f'image {file_name} made ')
-    
+

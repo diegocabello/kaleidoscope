@@ -4,7 +4,7 @@ from PIL import Image
 
 from midjourney_api import MidjourneyApi
 
-authorization = 'NTcwMjgwMTcxMzI0ODMzODEz.GtMgOz.bS44l1JTtJGa_ZUJ5i7mjRhThfXn7qgAHxZOqY'
+authorization = 'NTcwMjgwMTcxMzI0ODMzODEz.GC4Hsz.AX7ZdD5N1t7DVL8KSp4g4NEaYiSHV2iLah7Fwk' # this is the one that needs to be updated each time 
 application_id = '936929561302675456'
 guild_id = '884622163146059826'
 channel_id = '1201996275160191027'

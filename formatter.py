@@ -1,9 +1,8 @@
 import subprocess
 
 import openpyxl
-from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+from openpyxl.styles import colors
 
-initial_bit_color = "7A808C"          # light grey
 ignore_color = "2A4225"               # green-grey  
 
 character_descriptions = {'Elizabeth': 'a young woman in upperclass fancy victorian dress',
@@ -17,9 +16,9 @@ def charachter_with_description(character=''):
 def format_book(book_name=None):
 
     if not book_name:
-        book_name = 'pride and prejudice'
+        book_name = 'dracula'
     workbook = openpyxl.load_workbook(f'texts\\{book_name}.xlsx')
-    workbook = workbook.worksheets[0:1]
+    workbook = workbook.worksheets[21:22]
 
     list_of_keys = []
     dicto_change = {}
@@ -47,18 +46,22 @@ def format_book(book_name=None):
             initialize_flag = False
         
         bit_counter = 1
-        bit_color = initial_bit_color
+        bit_color = None
         bit_values = {key: None for key in dicto_values} 
         return_string = ''
+        to_be_a_bit = ''
 
-        for row in sheet.iter_rows(min_row = 3):
+        for row_counter, row in enumerate(sheet.iter_rows(min_row = 3, max_row=52)):
 
             for cell_counter, cell in enumerate(row):
                 
                 if cell_counter == 0:
 
-                    prev_bit_color = bit_color 
-                    bit_color = cell.fill.start_color.rgb[2:]
+                    if row_counter == 0:
+                        prev_bit_color, bit_color = cell.fill.start_color.rgb[2:], cell.fill.start_color.rgb[2:]
+                    else: 
+                        prev_bit_color = bit_color 
+                        bit_color = cell.fill.start_color.rgb[2:]
 
                     if prev_bit_color != bit_color:                     # at the change of the bit 
 
@@ -82,12 +85,14 @@ style: {bit_values["style"]} \
                                     return_string = return_string + f'{value}: {bit_values[value]} \n'
                             return_string = return_string + ' --ar 16:9 '
 
-                        list_of_prompts.append(return_string)           # writes
-                        list_of_bits.append(bit_values['sentence'])
-                        with open(f'prompts\\{book_name} prompts.txt', 'a') as filer:
-                            filer.write(f'**chapter {sheet_counter + 1} bit {bit_counter}**\n'+ return_string + '\n\n')
+                        list_of_prompts.append(return_string)          # writes
+                        list_of_bits.append(to_be_a_bit)
 
-                        return_string = f''                             # resets 
+                        with open(f'prompts\\{book_name} prompts.txt', 'a') as filer:
+                            filer.write(f'**chapter {sheet_counter + 1} bit {bit_counter}**\n'+ to_be_a_bit + '\n' + return_string + '\n\n')
+
+                        return_string = ''                             # resets 
+                        to_be_a_bit = ''
                         bit_values = {key: None for key in dicto_values} 
                         bit_counter += 1
 
@@ -101,13 +106,17 @@ style: {bit_values["style"]} \
                     until_changed_bool = dicto_change[category] == 'until changed'   
                     isnt_none_bool = cell_value is not None  
 
-                    if until_changed_bool and isnt_none_bool and category not in ['also present', 'remove presence']:            # if it exists and is marked until changed
+                    if one_shot_bool and isnt_none_bool:                                                                         # one shot
+                        bit_values[category] = bit_values[category] + cell_value + ' ' if bit_values[category] != None else cell_value + ' '
+
+                    elif until_changed_bool and isnt_none_bool and category not in ['also present', 'remove presence']:          # until changed, exists
                         bit_values[category] = cell_value
                         dicto_values[category] = cell_value
-                    elif until_changed_bool and not isnt_none_bool and category not in ['also present', 'remove presence']:      # if it's none and is marked until changed 
+                    elif until_changed_bool and not isnt_none_bool and category not in ['also present', 'remove presence']:      # until changed, does not exist
                         bit_values[category] = dicto_values[category] 
-                    elif (one_shot_bool or category == 'sentence') and isnt_none_bool:                                           # regular data mark
-                        bit_values[category] = bit_values[category] + cell_value if bit_values[category] != None else cell_value
+                        
+                    elif category == 'sentence':                                                                                 # special cases
+                        to_be_a_bit = to_be_a_bit + cell_value
                     elif category == 'also present':
                         if cell_value:
                             present_list.extend(cell_value.split(', '))
@@ -127,5 +136,5 @@ style: {bit_values["style"]} \
     return {'prompts': list_of_prompts, 'bits': list_of_bits}
 
 if __name__ == "__main__":
-    format_prompts()
+    format_book()
 
