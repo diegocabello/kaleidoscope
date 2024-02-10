@@ -51,5 +51,5 @@ def main(book_name = 'dracula'):
     subprocess.run(file_name, shell=True)
 
 
-if __name__ == ' __main__':
+if __name__ == '__main__':
     main(book_name = 'dracula')

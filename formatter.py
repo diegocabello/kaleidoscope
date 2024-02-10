@@ -10,7 +10,7 @@ character_descriptions = {'Elizabeth': 'a young woman in upperclass fancy victor
                           'Mr. Bennet': 'a middle-aged, older man in victorian england',
                           'Mrs. Bennet': 'a middle aged, older woman in victorian england fancy dress'}
 
-def charachter_with_description(character=''):
+def character_with_description(character=''):
     return f'{character}, {character_descriptions[character]} ' if character in character_descriptions else character
 
 def format_book(book_name=None):
@@ -70,10 +70,10 @@ def format_book(book_name=None):
                             also_present_string = ''
                             if len(present_list) != 0:
                                 for character in present_list:
-                                    also_present_string = also_present_string + charachter_with_description(character)
+                                    also_present_string = also_present_string + character_with_description(character)
 
                             return_string = return_string + f'\
-{charachter_with_description(bit_values["speaker"])} is speaking to {charachter_with_description(bit_values["spoken to"])} \
+{character_with_description(bit_values["speaker"])} is speaking to {character_with_description(bit_values["spoken to"])} \
 in {bit_values["setting"]} \
 {"also present in the background are" + also_present_string if also_present_string != "" else ""} \
 style: {bit_values["style"]} \

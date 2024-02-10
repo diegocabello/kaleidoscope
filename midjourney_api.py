@@ -90,7 +90,7 @@ class MidjourneyApi():
                 ValueError("Timeout: 90 seconds elapsed")
             time.sleep(10)
             timer += 10
-            print(f'\tGet Message: {str(timer)} seconds elapsed... ')
+            print(f'\t\tGet Message: {str(timer)} seconds elapsed... ')
 
 
 
@@ -124,7 +124,7 @@ class MidjourneyApi():
         for i in range(9):
             time.sleep(10)
             timer += 10
-            print(f'\tDownload Image: {str(timer)} seconds elapsed... ')
+            print(f'\t\tDownload Image: {str(timer)} seconds elapsed... ')
             try:
                 response = requests.get(f'https://discord.com/api/v9/channels/{self.channel_id}/messages', headers=headers)
                 messages = response.json()
@@ -136,7 +136,6 @@ class MidjourneyApi():
                 self.image_name = image_name
                 with open(image_name, "wb") as file:
                     file.write(image_response.content)
-                    print(f'image {image_name} saved at "images" ')
                 break
             except:
                 raise ValueError("Timeout: 90 seconds elapsed ")

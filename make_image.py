@@ -3,6 +3,7 @@ import subprocess
 from PIL import Image
 
 from midjourney_api import MidjourneyApi
+from colorprint import colorprint
 
 authorization = 'NTcwMjgwMTcxMzI0ODMzODEz.GC4Hsz.AX7ZdD5N1t7DVL8KSp4g4NEaYiSHV2iLah7Fwk' # this is the one that needs to be updated each time 
 application_id = '936929561302675456'
@@ -21,15 +22,15 @@ def make_images(prompt='', location=None, file_name=None):
     api_instance.choose_images()
     api_instance.download_image()
 
-    print(f'made image {file_name}! ')
+    colorprint('magenta', f'\tmade image {file_name} ')
 
     background_path = os.path.join(location, "images\\backgrounds", file_name)
     image_path = os.path.join(location, "images", file_name)
     overlay_path = os.path.join('resources', 'overlay.png')
 
-    cmd = f'ffmpeg -i {image_path} -vf "zoompan=z=\'zoom+0.3\':d=1:s=1920x1080, boxblur=15" -frames:v 1  {background_path}'
+    cmd = f'ffmpeg -i {image_path} -vf "zoompan=z=\'zoom+0.3\':d=1:s=1920x1080, boxblur=15" -frames:v 1  -loglevel warning {background_path}'
     cmd = f'ffmpeg -i {image_path} -vf "zoompan=z=\'min(zoom+0.3,2.0)\':x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\':d=1:s=1920x1080, \
-    boxblur=15" -frames:v 1 {background_path}'
+    boxblur=15" -frames:v 1 -loglevel warning {background_path}'
     subprocess.run(cmd, shell=True)
 
     # overlay_image = Image.new('RGBA', (1920, 1080), color = (0, 0, 0, 40)) # change this if you want to change how dark it is 

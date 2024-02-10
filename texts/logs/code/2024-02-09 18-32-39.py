@@ -131,6 +131,7 @@ def sentence_parser(sentence_list, input_color_dicto):
         to_put_in_dicto['sentence'] = sentence
         to_put_in_dicto['color'] = color 
 
+        print(to_put_in_dicto)
         output_list.append(to_put_in_dicto)
 
     return output_list
@@ -273,17 +274,18 @@ def parse_book(book_name=None):
 
             run_further = False
             for sentence_counter, sentence in enumerate(to_pass):                                         #    ====EXCEL====
+                print(sentence_counter)
 
                 if isinstance(sentence, str):
                     if not sentence or not sentence.isspace():
                         run_further = True
                 else: # elif sentence_parser_bool:
                     if sentence_counter == 0:
-                        prev_color, color = solid_fill(sentence['color']), solid_fill(sentence['color'])
+                        prev_color, color = to_pass['color'], to_pass['color']
                     else:
                         prev_color = color
-                        color = solid_fill(sentence['color'])
-                    sentence = sentence['sentence']
+                        color = to_pass['color']
+                    sentence = to_pass['sentence']
                     run_further = True
 
                 if run_further:

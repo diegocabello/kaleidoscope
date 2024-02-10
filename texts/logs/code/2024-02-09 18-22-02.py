@@ -131,6 +131,7 @@ def sentence_parser(sentence_list, input_color_dicto):
         to_put_in_dicto['sentence'] = sentence
         to_put_in_dicto['color'] = color 
 
+        print(to_put_in_dicto)
         output_list.append(to_put_in_dicto)
 
     return output_list
@@ -267,26 +268,24 @@ def parse_book(book_name=None):
                     color_dict_to_pass = {'color': initial_quote_color, 'highlite': initial_quote_to_sentence_color}
                 elif sp['color'] == alternate_quote_color:
                     color_dict_to_pass = {'color': alternate_quote_color, 'highlite': alternate_quote_to_sentence_color}
-                to_pass = sentence_parser(sentence_list, color_dict_to_pass)
+                to_pass = color_dict_to_pass
             else:
                 to_pass = sentence_list
 
-            run_further = False
             for sentence_counter, sentence in enumerate(to_pass):                                         #    ====EXCEL====
+                print(sentence_counter)
 
-                if isinstance(sentence, str):
-                    if not sentence or not sentence.isspace():
-                        run_further = True
-                else: # elif sentence_parser_bool:
-                    if sentence_counter == 0:
-                        prev_color, color = solid_fill(sentence['color']), solid_fill(sentence['color'])
-                    else:
-                        prev_color = color
-                        color = solid_fill(sentence['color'])
-                    sentence = sentence['sentence']
-                    run_further = True
+                if not sentence or not sentence.isspace():
 
-                if run_further:
+                    if sentence_parser_bool:
+                        print(to_pass)
+                        if sentence_counter == 0:
+                            prev_color, color = to_pass['color'], to_pass['color']
+                        else:
+                            prev_color = color
+                            color = to_pass['color']
+                        sentence = to_pass['sentence']
+
                     # speaker, color, and typer are defined above; if it is None it has to be defined in an if/else block 
 
                     paragraph_blackout = solid_fill('a2a2a2')
@@ -342,8 +341,6 @@ def parse_book(book_name=None):
                         cell.fill, cell.border, cell.alignment = columns_values[columns[cell_counter][0]]['color'], border,  columns_values[columns[cell_counter][0]]['alignment']
 
                 start_index = start_index + 1 
-
-            run_further = False
 
         sheet.cell(row=3, column=index_of_also_present).value = ', '.join(present_list)
 

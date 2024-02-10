@@ -279,10 +279,10 @@ def parse_book(book_name=None):
                         run_further = True
                 else: # elif sentence_parser_bool:
                     if sentence_counter == 0:
-                        prev_color, color = solid_fill(sentence['color']), solid_fill(sentence['color'])
+                        prev_color, color = sentence['color'], sentence['color']
                     else:
                         prev_color = color
-                        color = solid_fill(sentence['color'])
+                        color = sentence['color']
                     sentence = sentence['sentence']
                     run_further = True
 

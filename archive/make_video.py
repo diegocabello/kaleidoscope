@@ -6,7 +6,6 @@ import moviepy.editor as mp
 import numpy
 from PIL import Image, ImageDraw, ImageFont
 import sympy as sp
-import ffmpeg
 from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips
 from pydub import AudioSegment
 from colorama import Fore, Back, Style
@@ -15,11 +14,10 @@ from colorama import init as color_init
 from ascii_art_numbers import numbers as numbers
 from caption import max_width as max_caption_width
 
-"""THESE ARE THE GLOBAL VARIABLES"""
 size = (1920, 1080)
 start_percentage = 75
+end_percentage = 85
 fps = 24
-""""""
 
 """THIS INITIALIEZES THE COLOR THING"""
 color_init()
@@ -33,44 +31,11 @@ magenta = Fore.MAGENTA
 cyan = Fore.CYAN
 white = Fore.WHITE
 
-def colorprint(color=None, text=None):
+reset = Style.RESET_ALL
+
+def color_print(color = white, text=None):
     text = str(text)
-    print(color + text + Style.RESET_ALL)
-
-def c_print(color = white, text=None):
-    text = str(text)
-    print(color + text + Style.RESET_ALL)
-""""""
-
-c_print(yellow, 'imported...')
-
-"""THIS DEFINES THE CLASS AND MAKES ALL THE OBJECTS"""
-class video_inputs:
-    def __init__(self, image, blurred_image, audio, audio_duration, count, caption_image_path):
-        self.image = image
-        self.blurred_image = blurred_image
-        self.audio = audio
-        self.audio_duration = audio_duration
-        self.count = count
-        self.caption_image_path = caption_image_path
-    
-
-def sotr(number_clips=10):
-    listo = []
-    for x in range(1, number_clips + 1):
-        audio_path = f"D:\\babel2\\audio\\{x}.mp3"
-        thee_class = video_inputs(
-            image = f"D:\\babel2\\images\\cropped\\{x}.png", 
-            blurred_image = f"D:\\babel2\\images\\zoomed_and_blurred\\{x}.png", 
-            audio = AudioFileClip(audio_path), 
-            audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000), # which is in seconds float
-            count = x,
-            caption_image_path = f"c:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\images\\captions\\{x-1}.png"
-        )
-
-        listo.append(thee_class)
-
-    return listo
+    print(color + text + reset)
 """"""
 
 def zoom_ratio(frame_number = 1, start_percentage=75, end_percentage = 85):
@@ -85,76 +50,115 @@ def zoom_ratio(frame_number = 1, start_percentage=75, end_percentage = 85):
     
     return multiplier
 
+def make_video(location, count):
 
-def make_sub_video(inputer = None):
-    # unpack
-    image = inputer.image
-    blurred_img = inputer.blurred_image
-    audio = inputer.audio
-    audio_duration = inputer.audio_duration
-    count = inputer.count
-    caption_image_path = inputer.caption_image_path
+    count = str(count)
+
+    image = os.path.join(location, 'images', count + '.png')
+    background = os.path.join(location, 'images', 'backgrounds', count + '.png')
+    caption = os.path.join(location, 'images', 'captions', count + '.png')
+    try: 
+        audio_path = os.path.join(location, 'audio', count + '.mp3')
+        audio = AudioFileClip(audio_path)
+        audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000)
+        dodobool = True
+    except:
+        audio_duration = 5
+        dodobool = False
+
     try:
-        c_print(yellow, numbers[count] + '\n')
+        color_print(yellow, numbers[count] + '\n')
     except:
         pass
 
     ratio = 1
-    blurred_img_obj = Image.open(blurred_img)
-    img_obj = Image.open(image)
-    caption_image_obj = Image.open(caption_image_path)
+    multiplier = 1
+    complex_print = False
 
-    frame_count = int(audio_duration * fps)
-    c_print(green, str(frame_count) + ' frames ')
+    blurred_image_obj, img_obj, caption_image_obj = Image.open(background), Image.open(image), Image.open(caption) # intial create objects
+    print(blurred_image_obj)
 
-    new_frame = blurred_img_obj.copy()
-
-    list_img_frames = []
     re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
 
-    new_frame.paste(overlay_image_obj, (0, 0),  overlay_image_obj.convert("RGBA"))    #darken background image
-    new_frame.paste(caption_image_obj, (((1920 - max_caption_width) // 2), 1000), caption_image_obj.convert("RGBA")) # add caption
+    to_branch_from = (size[1] * ((100 - end_percentage) / 2 ) / 100)    # determines proportionally where to put the caption 
+    other_expendature = (size[1] - to_branch_from) + (to_branch_from / 2)
+    capt_cushion = (caption_image_obj.height / 2)                       # adds half the caption height to it to center it 
+    capt_height_coord = int(other_expendature - capt_cushion)
+    capt_width_coord = int((size[0] - max_caption_width) // 2)
+    caption_coords = (capt_width_coord, capt_height_coord)
+
+    list_img_frames = []
+    change_frame_count = 0
+    frame_count = int(audio_duration * fps)
+    color_print(green, str(frame_count) + ' frames ')
+
+    #.paste(caption_image_obj, caption_coords, caption_image_obj.convert("RGBA")) # add caption
 
     for frame in range(frame_count):
-        frame = frame + 1
+        frame += 1
+        change_frame_count += 1
+
+        copied_background = blurred_image_obj.copy().resize(size, Image.LANCZOS)
+
         new_re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
-        if new_re_size[1] > re_size[1]:
-            re_sized_image = img_obj.resize(new_re_size, Image.LANCZOS)
+
+        if frame != 1:
+            multiplier = multiplier * 1.002
+            background_re_size = tuple(int(x * multiplier) for x in size)
+            background_re_size = tuple(x + 1 if x % 2 == 1 else x for x in background_re_size)
+            copied_background = copied_background.resize(background_re_size, Image.LANCZOS) # resize background
+            diff_x = (background_re_size[0] - size[0]) // 2
+            diff_y = (background_re_size[1] - size[1]) // 2
+            crop_here = (diff_x, diff_y, (background_re_size[0] - diff_x), (background_re_size[1] - diff_y))
+            copied_background = copied_background.crop(crop_here).resize(size, Image.LANCZOS)
+            color_print(cyan, str(copied_background.size))
+
+            copied_background = copied_background.paste(caption_image_obj, caption_coords, caption_image_obj.convert("RGBA")) # add caption 
+            print('\n')
+        else:
+            #copied_background.paste(caption_image_obj, caption_coords, caption_image_obj.convert("RGBA")) # add caption
+            copied_background.paste(img_obj, re_size, img_obj.convert("RGBA"))      # overlay image
+            color_print(cyan, str(copied_background.size))
+
+
+        """
+        if new_re_size[1] > re_size[1] and frame != 1:
+            re_sized_image = img_obj.resize(new_re_size, Image.LANCZOS) # resize image 
             re_size = new_re_size
             position = tuple(((s - r) // 2) for s, r in zip(size, re_size))
-            new_frame.paste(re_sized_image, position, re_sized_image.convert("RGBA"))      #overlay image
-            new_frame_arr = numpy.array(new_frame)
+            copied_background.paste(re_sized_image, position, re_sized_image.convert("RGBA"))      # overlay image
+            complex_print = True
+        """
+
+        new_frame_arr = numpy.array(copied_background)
+
+        if frame % 10 == 0 or frame == 1:
+            if complex_print:
+                print('\t' + red + 'new image ' + cyan + str(change_frame_count).zfill(2) + red + ' at frame ' + green + str(frame).zfill(2) + red + ' of ' + green + str(frame_count) + reset)
+            else:
+                print('\t' + red + 'made frame ' + yellow + str(frame).zfill(2) + red + ' of ' + green + str(frame_count) + reset)
+        elif complex_print:
+            print('\t' + red + 'new image ' + green + str(change_frame_count).zfill(2) + red + ' at frame ' + green + str(frame).zfill(2) + red + ' of ' + green + str(frame_count) + reset)
+
+        complex_print = False
 
         list_img_frames.append(new_frame_arr)
-
         ratio = zoom_ratio(frame_number = (frame+1))
 
-        c_print(red, f'image {frame} of {frame_count} made ')
-
+    print(red + 'frame ' + green + str(frame_count) + red + ' of ' + green + str(frame_count) + reset)
 
     clip = ImageSequenceClip(list_img_frames, fps=fps)  
-    clip = clip.set_audio(audio)
-    clip.write_videofile(os.path.abspath(f'D:\\babel2\\video\\subvideos\\{count}.mp4'))
+    if dodobool: 
+        clip = clip.set_audio(audio)
+    clip.write_videofile(os.path.join(location, 'subvideos', count + '.mp4'))
 
-    c_print(cyan, f'video {count} made ')
-    
-    return clip
-
-
-#if os.path.isfile('output.mp4'):                        # the output video 
-#    os.remove('output.mp4')
-                                    
-def stitch_from_subvideos():
-    subvideos_path_list = list(f'd:\\babel2\\videos\\subvideos\\{x}' for x in range(1,10))
-    
+    color_print(cyan, f'video {count} made ')
+        
+#==============================================================================================================================================
 
 def main():
     sub_videos_list = []
-    list_of_objects = sotr()
-
-    for object in list_of_objects:
-        sub_videos_list.append(make_sub_video(inputer = object))
 
     final_clip = concatenate_videoclips(sub_videos_list)
     final_clip.write_videofile("final_output07.mp4") 
