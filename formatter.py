@@ -17,8 +17,8 @@ def format_book(book_name=None):
 
     if not book_name:
         book_name = 'dracula'
-    workbook = openpyxl.load_workbook(f'texts\\{book_name}.xlsx')
-    workbook = workbook.worksheets[21:22]
+    workbook = openpyxl.load_workbook(f'texts\\{book_name}.xlsm')
+    workbook = workbook.worksheets[0:1]
 
     list_of_keys = []
     dicto_change = {}
@@ -51,11 +51,11 @@ def format_book(book_name=None):
         return_string = ''
         to_be_a_bit = ''
 
-        for row_counter, row in enumerate(sheet.iter_rows(min_row = 3, max_row=52)):
+        for row_counter, row in enumerate(sheet.iter_rows(min_row = 3, max_row=26)): # ===============ROWS===============
 
             for cell_counter, cell in enumerate(row):
                 
-                if cell_counter == 0:
+                if cell_counter == 1:
 
                     if row_counter == 0:
                         prev_bit_color, bit_color = cell.fill.start_color.rgb[2:], cell.fill.start_color.rgb[2:]

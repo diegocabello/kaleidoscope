@@ -40,14 +40,15 @@ style: gothic, photorealistic
  --ar 16:9 
 
 **chapter 1 bit 7**
-“I think, sir, his back is broken.See, both his right arm and leg and the whole side of his face are paralysed.”How such a thing could have happened puzzled the attendant beyond measure.
+“I think, sir, his back is broken.See, both his right arm and leg and the whole side of his face are paralysed.”
 prompt: a view from the top down of a mangled persons body lying on the floor. His face is smashed, his back is broken. Two men in 1900s clothing look onwards, one is speaking 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
  --ar 16:9 
 
 **chapter 1 bit 8**
-He seemed quite bewildered, and his brows were gathered in as he said:—
+How such a thing could have happened puzzled the attendant beyond measure.He seemed quite bewildered, and his brows were gathered in as he said:—
 prompt: a view from the top down of a mangled persons body lying on the floor. His face is smashed, his back is broken. Two more men in 1900s clothing are standing around him looking downwards, one is speaking 
 setting: a room in a castle 
 style: gothic, photorealistic 
@@ -59,13 +60,13 @@ display: top down view
 prompt: a man wearing 1900s clothing is head smashing his face into the floor in the middle of the room 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
  --ar 16:9 
 
 **chapter 1 bit 10**
 I saw a young woman do it once at the Eversfield Asylum before anyone could lay hands on her.
 prompt: a woman in an asylum cell is smashing hitting her head against the wall 
 setting: a 1900s asylum cell 
-style: gothic, photorealistic 
  --ar 16:9 
 
 **chapter 1 bit 11**
@@ -87,6 +88,8 @@ style: gothic, photorealistic
 prompt: a man in 1900s clothing is speaking to another man in 1900s clothing , pointing his finger at him giving him instructions 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
+speaker: a few minutes  
  --ar 16:9 
 
 **chapter 1 bit 14**
@@ -101,6 +104,7 @@ style: gothic, photorealistic
 prompt: a man in 1900s clothing is looking at a mangled person's body on the floor in the middle of the  . Another person is kneeling besides the body. 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
  --ar 16:9 
 
 **chapter 1 bit 16**
@@ -122,6 +126,7 @@ style: gothic, photorealistic
 prompt: a doctor is whispering to a man dressed in 1900s clothing. Focus on just the doctor and the man, and their faces 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
  --ar 16:9 
 
 **chapter 1 bit 19**
@@ -129,6 +134,7 @@ style: gothic, photorealistic
 prompt: a man in 1900s clothing speaks to another man in 1900s clothing in 
 setting: a room in a castle 
 style: gothic, photorealistic 
+frame: speaker  
  --ar 16:9 
 
 **chapter 1 bit 20**
@@ -141,18 +147,25 @@ style: gothic, photorealistic
 **chapter 1 bit 21**
 The wounds of the face was superficial; the real injury was a depressed fracture of the skull, extending right up through the motor area.
 prompt: a doctor and a man in 1900s clothing are standing over a body in the middle of  . 
-setting: a room in a castle 
-style: gothic, photorealistic 
  --ar 16:9 
 
 **chapter 1 bit 22**
-The Professor thought a moment and said:—“We must reduce the pressure and get back to normal conditions, as far as can be;the rapidity of the suffusion shows the terrible nature of his injury.
+The Professor thought a moment and said:—
 prompt: the doctor is speaking, in focus the background is blurred and a man in 1900s clothing standing behind him is blurred 
 setting: a room in a castle 
 style: gothic, photorealistic 
  --ar 16:9 
 
 **chapter 1 bit 23**
+“We must reduce the pressure and get back to normal conditions, as far as can be;the rapidity of the suffusion shows the terrible nature of his injury.
+prompt: the doctor is speaking, in focus the background is blurred and a man in 1900s clothing standing behind him is blurred 
+setting: a room in a castle 
+style: gothic, photorealistic 
+frame: speaker  
+speaker: Arthur  
+ --ar 16:9 
+
+**chapter 1 bit 24**
 The whole motor area seems affected.The suffusion of the brain will increase quickly, so we must trephine at once or it may be too late.”As he was speaking there was a soft tapping at the door.
 prompt: a mangled body lying on the floor in a room is struggling to move 
 setting: a room in a castle 
@@ -160,7 +173,7 @@ style: gothic, photorealistic
 display: top down view  
  --ar 16:9 
 
-**chapter 1 bit 24**
+**chapter 1 bit 25**
 I went over and opened it and found in the corridor without, Arthur and Quincey in pajamas and slippers: the former spoke:—
 prompt: two men in 1900s pajamas and slippers are at the door to the entrance of the room. A man in 1900s formal attire is opening the door 
 setting: a room in a castle 
