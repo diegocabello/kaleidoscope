@@ -36,6 +36,6 @@ The creation of a **V-BOOK** involves three main steps: parsing and annotating a
 
 ## Project Status
 
-On 04 Feb 2024, a working version was tested and completed. This project is mostly over the hill for coding but there are still a few things to be done, including: centering the captions vertically, finding a text-to-speech API, changing the zoom equasion and applying it to the background, adding asyncronous functionality, and managing python packages. This project has expanded beyond the scope of one person working on it and is currently in the planning phase for marketing, financing, and deployement. 
+This project is mostly complete and is presentable, but there is a little more code to be done including: adding asyncronous functionality, managing python packages, and making style, characters, and settings more consistent. This project is currently in the planning phase for marketing, financing, and deployement. 
 
 Created by Diego Cabello
