@@ -3,6 +3,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 from bigstringer import bigstringer
+from colorprint import colorprint
 
 font_path = os.path.abspath('C:\\users\\diego\\documents\\my stuff\\programming stuff\\babel\\resources\\fonts\\EBGaramond-Medium.ttf')
 font_color = (255, 255, 255)

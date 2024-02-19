@@ -8,24 +8,22 @@ import numpy
 from PIL import Image, ImageDraw, ImageFont
 import sympy as sp
 import math
-from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips
+from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_audioclips
 from pydub import AudioSegment
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 from colorama import init as color_init
 
-from ascii_art_numbers import numbers as numbers
-from caption import max_width as max_caption_width
 from colorprint import colorprint
+from ascii_art_numbers import numbers as numbers
+from make_caption import max_width as max_caption_width
+from resources.create_resources import padding
 
 size = (1920, 1080)
 start_percentage = 75
 end_percentage = 85
 fps = 24
 
-""" SEE RESOURCES\MAKE RESOURCES.PY """
-padding = 50 
-
-"""THIS INITIALIZES THE COLOR THING"""
+"""THIS INITIALIZES THE COLOR"""
 color_init()
 
 black = Fore.BLACK
@@ -60,50 +58,64 @@ def zoomer_ratio(frame_number = 1, start_percentage=75, end_percentage = 85):
     
     return multiplier
 
-
-def make_zoom_in_video(location, file_name, duration=5, zoom_ratio=0.022):
+def make_zoom_in_video(location, file_name, audio_paths = [], caption_paths = [], zoom_ratio=0.022, fps=fps):
     file_name = str(file_name)
     frame_counter = 0
 
-    # DECLARE THINGS
+    # declare
     image = os.path.join(location, 'images', file_name + '.png')
     background = os.path.join(location, 'images', 'backgrounds', file_name + '.png')
-    caption = os.path.join(location, 'images', 'captions', file_name + '.png')
     shadow = r'resources\shadow_blurred.png'
-    try: 
-        audio_path = os.path.join(location, 'audio', file_name + '.mp3')
-        audio = AudioFileClip(audio_path)
-        audio_duration = (len(AudioSegment.from_file(audio_path)) / 1000)
-        dodobool = True
-    except:
-        audio_duration = 5
-        dodobool = False
+    img_obj, shadow_obj = Image.open(image), Image.open(shadow) # intial create objects
 
-    try:
-        colorprint('yellow', numbers[int(file_name)] + '\n')
-    except:
-        pass
+    # handle audio
+    audio_data = []
+    for audio_path in audio_paths:
+        to_append = {}
+        to_append["audio path"] = audio_path
+        to_append["length in frames"] = (len(AudioSegment.from_file(audio_path)) * fps // 1000) 
+        audio_data.append(to_append)
+    concatenated_audio = concatenate_audioclips([AudioFileClip(dicto["audio path"]) for dicto in audio_data])
+    #total_duration = concatenated_audio.duration
+    total_duration = sum([dicto["length in frames"] for dicto in audio_data]) / 24
+    colorprint('magenta', total_duration)
 
-    blurred_image_obj, img_obj, caption_image_obj, shadow_obj = Image.open(background), Image.open(image), Image.open(caption), Image.open(shadow) # intial create objects
-    shadow_size = shadow_obj.size
-    caption_coords = caption_coords_function(caption_image_obj)
+    # handle captions 
+    caption_data = []
+    for caption in caption_paths: 
+        to_append = {}
+        caption_image = Image.open(caption)
+        to_append["image"] = caption_image
+        to_append["coords"] = caption_coords_function(caption_image)
+        caption_data.append(to_append)
 
+    caption_obj = caption_data[0]["image"]
+    caption_coords = caption_coords_function(caption_obj)
+
+    print(caption_data)
+    print(audio_data)
+
+    # initialize counters 
     ratio = 1
+    complex_print = False
+    change_fram_count = 0
+    a_c_pair_counter = 0
+    fram_count = int(total_duration * fps)
+    more_than_frame_counter = audio_data[0]["length in frames"]
+
+    # where things start + how big they are
+    shadow_size = shadow_obj.size
     re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in size)
     shadow_re_size = tuple((new_size := math.ceil(x * (start_percentage/100) * ratio)) + (new_size % 2) for x in shadow_size)
     position = re_size
     shadow_position = tuple(int(x - padding * ratio * (start_percentage/100)) for x in position)
-
     re_sized_image = img_obj.resize(re_size, Image.LANCZOS)
     re_sized_shadow = shadow_obj.resize(shadow_re_size, Image.LANCZOS)
 
-    complex_print = False
-    change_fram_count = 0
-    fram_count = int(audio_duration * fps)
-    colorprint(green, '\t' + str(fram_count) + ' frames ')
+    colorprint("green", '\t' + str(fram_count) + ' frames ')
 
     def effect(get_frame, t):
-        nonlocal frame_counter, position, complex_print, re_sized_image, re_sized_shadow, shadow_position, ratio, re_size, change_fram_count, shadow_obj
+        nonlocal frame_counter, position, complex_print, re_sized_image, re_sized_shadow, shadow_position, ratio, re_size, change_fram_count, shadow_obj, a_c_pair_counter, caption_obj, caption_coords, more_than_frame_counter
 
         frame_counter += 1
 
@@ -143,12 +155,20 @@ def make_zoom_in_video(location, file_name, duration=5, zoom_ratio=0.022):
         # PASTE 
         img.paste(re_sized_shadow, shadow_position, re_sized_shadow.convert("RGBA")) # shadow
         img.paste(re_sized_image, position, re_sized_image.convert("RGBA"))      # image
-        img.paste(caption_image_obj, caption_coords, caption_image_obj.convert("RGBA")) # caption
+
+        if frame_counter >= more_than_frame_counter:
+            if not (a_c_pair_counter + 1) == len(audio_data):
+                a_c_pair_counter += 1 
+            more_than_frame_counter += audio_data[a_c_pair_counter]["length in frames"]
+            caption_obj = caption_data[a_c_pair_counter]["image"]
+            caption_coords = caption_coords_function(caption_obj)
+        
+        img.paste(caption_obj, caption_coords, caption_obj.convert("RGBA")) # caption
 
         # PRINT TO COMMAND LINE 
         if frame_counter % 10 == 0 or frame_counter == 1:
             if complex_print:
-                print('\t' + red + 'new image ' + magenta + str(change_fram_count).zfill(2) + red + ' at frame ' + green + str(frame_counter).zfill(2) + red + ' of ' + green + str(fram_count) + reset)
+                print('\t' + red + 'new image ' + cyan + str(change_fram_count).zfill(2) + red + ' at frame ' + yellow + str(frame_counter).zfill(2) + red + ' of ' + green + str(fram_count) + reset)
             else:
                 print('\t' + red + 'made frame ' + yellow + str(frame_counter).zfill(2) + red + ' of ' + green + str(fram_count) + reset)
         elif complex_print:
@@ -163,12 +183,14 @@ def make_zoom_in_video(location, file_name, duration=5, zoom_ratio=0.022):
 
         return result
 
-    return mp.ImageClip(background).set_fps(24).set_duration(duration).resize(size).fl(effect)
+    return mp.ImageClip(background).set_fps(fps).set_duration(total_duration).resize(size).fl(effect).set_audio(concatenated_audio) 
 
-def make_video(location, file_name):
+def make_video(location, file_name, audio_paths, caption_paths):
 
     save_path = os.path.join(location, 'subvideos', str(file_name) + '.mp4')
-    make_zoom_in_video(location, file_name).write_videofile(save_path, fps=24, verbose=False) # codec='libx264',
+    make_zoom_in_video(location, file_name, audio_paths, caption_paths).write_videofile(save_path, fps=24, verbose=False) 
+
+#==============================================================================================================================================
 
 def make_video_depriciated(location, count):
 

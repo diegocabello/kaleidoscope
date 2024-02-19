@@ -13,6 +13,7 @@ from openpyxl.formatting.rule import CellIsRule
 
 from bigstringer import bigstringer
 from text_parser import sentencer, entitier
+from colorprint import colorprint
 
 initial_quote_color = "DFBB4C"        # dark yellow
 initial_quote_to_sentence_color = "A99A6C" # brown
@@ -189,20 +190,23 @@ def parse_book(book_name=None):
         subprocess.run(f'del "texts\\{book_name}.xlsx"', shell=True)
     workbook = openpyxl.Workbook()
 
+    # SHEET MANAGEMENT
+    by_chapters_characters = workbook.create_sheet(title='By Chapters Characters', index=0)
+    all_characters = workbook.create_sheet(title='All Characters', index=0)
+
     # IMPORTING AND PARSING
     text = bigstringer(f'texts\\{book_name}.txt')
     chapter_list = ['CHAPTER ' + chapter for chapter in text.split('CHAPTER') if chapter][0:25] 
-
-    for chapter_counter, chapter in enumerate(chapter_list): # has to be multiple 'for' loops                       #    ====CHAPTER====
-        chapter_list[chapter_counter] = [section + '\r\n\r\n' for section in chapter.split('\r\n\r\n') if section] 
     
-    for chapter_counter, chapter in enumerate(chapter_list):                            
+    book_present_list = []
 
-        print(chapter)
-        print('\n\n')
-        print(type(chapter))
+    for chapter_counter, chapter in enumerate(chapter_list):                                                        #    ====CHAPTER====
+
         chapter_splitted = split_on(chapter, ['CHAPTER', ' '])
         chapter_heading, chapter = chapter_splitted[0], chapter_splitted[1]
+        colorprint('green', chapter_heading)
+
+        chapter = [section + '\r\n\r\n' for section in chapter.split('\r\n\r\n') if section]
 
         sheet_name = str(chapter_counter + 1) 
         start_index = 3
@@ -211,11 +215,12 @@ def parse_book(book_name=None):
         speaker = None
         do_the_thing_flag = True
         type = 'paragraph'
-        present_list = []
+        chapter_present_list = []
         section_color = pink
 
         # WRITE HEADER TO EXCEL
         sheet = workbook[sheet_name] if sheet_name in workbook.sheetnames else workbook.create_sheet(sheet_name) # make the sheet
+
         sheet.column_dimensions['A'].width = 6
         sheet.column_dimensions['C'].width = 125
         sheet.column_dimensions['F'].width = 65
@@ -266,7 +271,11 @@ def parse_book(book_name=None):
                     spoken_to = speaker_list[0]
                 if get_speaker(section):
                     speaker = get_speaker(section)
-                    present_list.append(speaker)
+                    if speaker not in chapter_present_list:
+                        chapter_present_list.append(speaker)
+                    if speaker not in book_present_list:
+                        book_present_list.append(speaker)
+
             else:
                 speaker = None
 
@@ -401,7 +410,7 @@ def parse_book(book_name=None):
 
                 run_further = False
 
-        sheet.cell(row=3, column=index_of_also_present).value = ', '.join(present_list)
+        sheet.cell(row=3, column=index_of_also_present).value = ', '.join(chapter_present_list)
 
         sheet.conditional_formatting.add(f'F3:N{str(start_index - 1)}', true_rule)
         sheet.conditional_formatting.add(f'F3:N{str(start_index - 1)}', false_rule)
@@ -409,9 +418,9 @@ def parse_book(book_name=None):
         workbook.save(workbook_path)
         print(f'did chapter {str(chapter_counter + 1)} ')
 
-    for sheet in ['Sheet']:
-        if sheet in workbook:
-            del workbook[sheet]
+    for iterate_sheet in ['Sheet']:
+        if iterate_sheet in workbook:
+            del workbook[iterate_sheet]
             workbook.save(workbook_path)
 
     workbook.save(f'texts\\logs\\excel\\{book_name} {run_log_time}.xlsx')
